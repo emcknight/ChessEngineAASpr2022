@@ -1,3 +1,5 @@
+import chess
+
 #Base node class for chess engine
 class Node(object):
     #Initialize tree node with name of the move and the score associated to the move
