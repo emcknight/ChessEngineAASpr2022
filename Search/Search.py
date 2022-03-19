@@ -5,7 +5,7 @@
 # Version:      1.0
 
 import chess
-from Utilities.SearchUtils import negamaxUtil, alphaBetaUtil
+from Utilities.SearchUtils import negamaxUtil, alphaBetaUtil, searchMax, searchMin, maxAB, minAB
 
 
 def negamax(board: chess.Board, depth: int, evaluation):
@@ -52,3 +52,32 @@ def alphaBeta(board: chess.Board, depth: int, evaluation):
             selected_move = move
     return selected_move
 
+
+def minimax(depth: int, board: chess.Board):
+    # the function board.turn returns True if it White's turn to move and False if its Black's
+    # therefore we can use this function to determine if it should be max() or min()'s turn, with
+    # max referring to finding white's best move, and min referring to finding black's best move
+
+    if board.turn:
+        bestmove = searchMax(depth, board)
+    else:
+        bestmove = searchMin(depth, board)
+
+    return bestmove
+
+
+def minimaxAB(depth: int, board: chess.Board):
+    # the function board.turn returns True if it White's turn to move and False if its Black's
+    # therefore we can use this function to determine if it should be max() or min()'s turn, with
+    # max referring to finding white's best move, and min referring to finding black's best move
+
+    # alpha and beta will be set to the lowest or highest possible values max and min can get initially.
+    alpha = float('-inf')
+    beta = float('inf')
+
+    if board.turn:
+        bestmove = maxAB(depth, board, alpha, beta)
+    else:
+        bestmove = minAB(depth, board, alpha, beta)
+
+    return bestmove
