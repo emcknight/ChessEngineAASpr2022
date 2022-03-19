@@ -1,1 +1,1 @@
-from Search import negamax, alphaBeta
+from Search import negamax, alphaBeta, minimax, minimaxAB
