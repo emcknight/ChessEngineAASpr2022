@@ -54,3 +54,73 @@ def alphaBetaUtil(board: chess.Board, alpha: float, beta: float, depth: int, eva
     return alpha
 
 
+def searchMax(depth, board: chess.Board, evaluation):
+    if depth == 0 or board.outcome() is not None:
+        # return the score for the board and a filler board move for syntax
+        return [evaluation(board), "0000"]
+    maxVal = float('-inf')
+    maxMove = None
+    for move in board.legal_moves:
+        board.push(move)
+        score = searchMin(depth - 1, board, evaluation)
+        board.pop()
+        if score[0] > maxVal:
+            maxVal = score[0]
+            maxMove = move
+    return [maxVal, maxMove]
+
+
+def searchMin(depth, board: chess.Board, evaluation):
+    if depth == 0 or board.outcome() is not None:
+        # return the score for the board and a filler board move for syntax
+        return [evaluation(board), "0000"]
+    minVal = float('inf')
+    minMove = None
+    for move in board.legal_moves:
+        board.push(move)
+        score = searchMax(depth - 1, board, evaluation)
+        board.pop()
+        if score[0] < minVal:
+            minVal = score[0]
+            minMove = move
+    return [minVal, minMove]
+
+
+def maxAB(depth, board: chess.Board, alpha, beta, evaluation):
+    if depth == 0 or board.outcome() is not None:
+        # return the score for the board and a filler board move for syntax
+        return [evaluation(board), "000"]
+    maxVal = float('-inf')
+    maxMove = None
+    for move in board.legal_moves:
+        board.push(move)
+        score = minAB(depth - 1, board, alpha, beta, evaluation)
+        board.pop()
+        if score[0] > maxVal:
+            maxVal = score[0]
+            maxMove = move
+        if score[0] > alpha:
+            alpha = score[0]
+        if score[0] > beta:
+            break
+    return [maxVal, maxMove]
+
+
+def minAB(depth, board: chess.Board, alpha, beta, evaluation):
+    if depth == 0 or board.outcome() is not None:
+        # return the score for the board and a filler board move for syntax
+        return [evaluation(board), "0000"]
+    minVal = float('inf')
+    minMove = None
+    for move in board.legal_moves:
+        board.push(move)
+        score = maxAB(depth - 1, board, alpha, beta, evaluation)
+        board.pop()
+        if score[0] < minVal:
+            minVal = score[0]
+            minMove = move
+        if score[0] < beta:
+            beta = score[0]
+        if score[0] < alpha:
+            break
+    return [minVal, minMove]
