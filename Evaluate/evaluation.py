@@ -179,14 +179,3 @@ chessToIndex={
         'a2':8, 'b2':9, 'c2':10,'d2':11,'e2':12,'f2':13,'g2':14,'h2':15,
         'a1':0, 'b1':1, 'c1':2, 'd1':3, 'e1':4, 'f1':5, 'g1':6, 'h1':7
 }
-
-board=chess.Board()
-
-for mv in board.legal_moves:
-    move=mv
-
-board.push(move)
-
-print(evaluateScore(board,chessToIndex))
-
-print(board)
