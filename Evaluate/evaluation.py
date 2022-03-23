@@ -3,17 +3,15 @@
 # Date:         03/16/2022
 # Last Updated: 03/23/2022
 # Version:      1.1
-
-# Author:        Tucker Yazdani
-# Date:         03/18/2022
 import chess
 # Disclaimer: I did not come up with the evaluation criteria values myself. I only created the code to utilize it.
 # Source for evaluation criteria:
 # https://www.chessprogramming.org/Simplified_Evaluation_Function
 
-def evalPawnWhite(moveToIndex):
+def evalPawnWhite(moveToIndex,turn):
     'Returns evaluation score for where a Pawn is best on the board'
-    posEval=[
+    if turn==True:
+        posEval=[
                 0,  0,  0,  0,  0,  0,  0,  0,
                 50, 50, 50, 50, 50, 50, 50, 50,
                 10, 10, 20, 30, 30, 20, 10, 10,
@@ -22,12 +20,24 @@ def evalPawnWhite(moveToIndex):
                 5, -5,-10,  0,  0,-10, -5,  5,
                 5, 10, 10,-20,-20, 10, 10,  5,
                 0,  0,  0,  0,  0,  0,  0,  0
-    ]
+        ]
+    else:
+        posEval=[
+                0,  0,  0,  0,  0,  0,  0,  0,
+                5, 10, 10,-20,-20, 10, 10,  5,
+                5, -5,-10,  0,  0,-10, -5,  5,
+                0,  0,  0, 20, 20,  0,  0,  0,
+                5,  5, 10, 25, 25, 10,  5,  5,
+                10, 10, 20, 30, 30, 20, 10, 10,
+                50, 50, 50, 50, 50, 50, 50, 50,
+                0,  0,  0,  0,  0,  0,  0,  0
+        ]
     return posEval[moveToIndex]
 
-def evalKnightWhite(moveToIndex):
+def evalKnightWhite(moveToIndex,turn):
     'Returns evaluation score for where a Knight is best on the board'
-    posEval=[
+    if turn==True:
+        posEval=[
                 -50,-40,-30,-30,-30,-30,-40,-50,
                 -40,-20,  0,  0,  0,  0,-20,-40,
                 -30,  0, 10, 15, 15, 10,  0,-30,
@@ -36,12 +46,24 @@ def evalKnightWhite(moveToIndex):
                 -30,  5, 10, 15, 15, 10,  5,-30,
                 -40,-20,  0,  5,  5,  0,-20,-40,
                 -50,-40,-30,-30,-30,-30,-40,-50,
-    ]
+        ]
+    else:
+        posEval=[
+                -50,-40,-30,-30,-30,-30,-40,-50,
+                -40,-20,  0,  5,  5,  0,-20,-40,
+                -30,  5, 10, 15, 15, 10,  5,-30,
+                -30,  0, 15, 20, 20, 15,  0,-30,
+                -30,  5, 15, 20, 20, 15,  5,-30,
+                -30,  0, 10, 15, 15, 10,  0,-30,
+                -40,-20,  0,  0,  0,  0,-20,-40,
+                -50,-40,-30,-30,-30,-30,-40,-50,
+        ]
     return posEval[moveToIndex]
 
-def evalRookWhite(moveToIndex):
+def evalRookWhite(moveToIndex,turn):
     'Returns evaluation score for where a Rook is best on the board'
-    posEval=[
+    if turn==True:
+        posEval=[
                  0,  0,  0,  0,  0,  0,  0,  0,
                  5, 10, 10, 10, 10, 10, 10,  5,
                  -5,  0,  0,  0,  0,  0,  0, -5,
@@ -50,12 +72,24 @@ def evalRookWhite(moveToIndex):
                  -5,  0,  0,  0,  0,  0,  0, -5,
                  -5,  0,  0,  0,  0,  0,  0, -5,
                   0,  0,  0,  5,  5,  0,  0,  0
-    ]
+        ]
+    else:
+        posEval=[
+                  0,  0,  0,  5,  5,  0,  0,  0
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 5, 10, 10, 10, 10, 10, 10,  5,
+                  0,  0,  0,  0,  0,  0,  0,  0,
+        ]
     return posEval[moveToIndex]
 
-def evalBishopWhite(moveToIndex):
+def evalBishopWhite(moveToIndex,turn):
     'Returns evaluation score for where a Bishop is best on the board'
-    posEval=[
+    if turn==True:
+        posEval=[
                 -20,-10,-10,-10,-10,-10,-10,-20,
                 -10,  0,  0,  0,  0,  0,  0,-10,
                 -10,  0,  5, 10, 10,  5,  0,-10,
@@ -65,11 +99,24 @@ def evalBishopWhite(moveToIndex):
                 -10,  5,  0,  0,  0,  0,  5,-10,
                 -20,-10,-10,-10,-10,-10,-10,-20,
         ]
+    else:
+         posEval=[
+                -20,-10,-10,-10,-10,-10,-10,-20,
+                -10,  5,  0,  0,  0,  0,  5,-10,
+                -10, 10, 10, 10, 10, 10, 10,-10,
+                -10,  0, 10, 10, 10, 10,  0,-10,
+                -10,  5,  5, 10, 10,  5,  5,-10,
+                -10,  0,  5, 10, 10,  5,  0,-10,
+                -10,  0,  0,  0,  0,  0,  0,-10,
+                -20,-10,-10,-10,-10,-10,-10,-20,
+        ]       
     return posEval[moveToIndex]
+    # How to define if we are black or white?
 
-def evalQueenWhite(moveToIndex):
+def evalQueenWhite(moveToIndex,turn):
     'Returns evaluation score for where a Queen is best on the board'
-    posEval=[
+    if turn==True:
+        posEval=[
             -20,-10,-10, -5, -5,-10,-10,-20,
             -10,  0,  0,  0,  0,  0,  0,-10,
             -10,  0,  5,  5,  5,  5,  0,-10,
@@ -79,11 +126,23 @@ def evalQueenWhite(moveToIndex):
             -10,  0,  5,  0,  0,  0,  0,-10,
             -20,-10,-10, -5, -5,-10,-10,-20
         ]
+    else:
+        posEval=[
+            -20,-10,-10, -5, -5,-10,-10,-20,
+            -10,  0,  5,  0,  0,  0,  0,-10,
+            -10,  5,  5,  5,  5,  5,  0,-10,
+            0,  0,  5,  5,  5,  5,  0, -5,
+            -5,  0,  5,  5,  5,  5,  0, -5,
+            -10,  0,  5,  5,  5,  5,  0,-10,
+            -10,  0,  0,  0,  0,  0,  0,-10,
+            -20,-10,-10, -5, -5,-10,-10,-20
+        ]
     return posEval[moveToIndex]
 
-def evalKingWhite(moveToIndex):
+def evalKingWhite(moveToIndex,turn):
     'Returns evaluation score for where a King is best on the board'
-    posEval=[
+    if turn==True:
+        posEval=[
                 -30,-40,-40,-50,-50,-40,-40,-30,
                 -30,-40,-40,-50,-50,-40,-40,-30,
                 -30,-40,-40,-50,-50,-40,-40,-30,
@@ -92,23 +151,34 @@ def evalKingWhite(moveToIndex):
                 -10,-20,-20,-20,-20,-20,-20,-10,
                 20, 20,  0,  0,  0,  0, 20, 20,
                 20, 30, 10,  0,  0, 10, 30, 20
-    ]
+        ]
+    else:
+        posEval=[
+                20, 30, 10,  0,  0, 10, 30, 20,
+                20, 20,  0,  0,  0,  0, 20, 20,
+                -10,-20,-20,-20,-20,-20,-20,-10,
+                -20,-30,-30,-40,-40,-30,-30,-20,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                -30,-40,-40,-50,-50,-40,-40,-30,
+                20, 30, 10,  0,  0, 10, 30, 20
+        ]
     return posEval[moveToIndex]
 
-def evalType(pieceType,moveFromIndex):
+def evalType(pieceType,moveFromIndex,turn):
     'Activates a function to find an evaluation score for a piece type\'s position on the board'
     if pieceType.upper()=='P':
-        return evalPawnWhite(moveFromIndex)
+        return evalPawnWhite(moveFromIndex,turn)
     elif pieceType.upper()=='N':
-        return evalKnightWhite(moveFromIndex)
+        return evalKnightWhite(moveFromIndex,turn)
     elif pieceType.upper()=='B':
-        return evalBishopWhite(moveFromIndex)
+        return evalBishopWhite(moveFromIndex,turn)
     elif pieceType.upper()=='R':
-        return evalRookWhite(moveFromIndex)
+        return evalRookWhite(moveFromIndex,turn)
     elif pieceType.upper()=='Q':
-        return evalQueenWhite(moveFromIndex)
+        return evalQueenWhite(moveFromIndex,turn)
     elif pieceType.upper()=='K':
-        return evalKingWhite(moveFromIndex)
+        return evalKingWhite(moveFromIndex,turn)
     else:
         return 0
 
@@ -129,16 +199,22 @@ def evalCapture(capturedType):
     else:
         return 0
 
-def evalBlunder(board,moveToIndex,pieceType):
+def evalBlunder(board,moveToIndex,pieceType,turn):
     'Returns a negative evaluation score that reflects the loss of a piece.'
-    # How to define if we are black or white?
-    if board.attackers(chess.WHITE,moveToIndex) is not None:
-        return -evalCapture(pieceType)
+    if turn==True:
+        if board.attackers(chess.WHITE,moveToIndex) is not None:
+            return -evalCapture(pieceType)
+    else:
+        if board.attackers(chess.BLACK,moveToIndex) is not None:
+            return -evalCapture(pieceType)
     
 def evaluateScore(board,chessToIndex):
     'Aggregates the total score from evalCapture and evalType'
     # Set "move" to the latest move
     move = board.move_stack[-1]
+
+    # Find out if Black or White made the most recent movement
+    turn = not board.turn
 
     # Set moveFromSquare to the original position of piece before movement. Set moveToSquare to the original piece after movement. Cast into a string for both.
     # Note: Move is an object in form of "a2a3". Where a2 is original position and a3 is ending position.
@@ -157,7 +233,7 @@ def evaluateScore(board,chessToIndex):
     # Get piece type of the piece that was just moved. Cast into a string.
     pieceType=str(board.piece_at(chessToIndex[moveFromSquare]))
 
-    score=evalCapture(capturedType)+evalType(pieceType,moveFromIndex)+evalBlunder(board,moveToIndex,pieceType)
+    score=evalCapture(capturedType)+evalType(pieceType,moveFromIndex,turn)+evalBlunder(board,moveToIndex,pieceType,turn)
     return score
 
 # Chess location to index dictionary.
