@@ -115,22 +115,16 @@ def evalType(pieceType,moveFromIndex):
 def evalCapture(capturedType):
     'Returns a score for capturing different pieces on the board that are valued differently'
     if capturedType.upper()=='P':
-        print('Pawn Captured')
         return 100
     elif capturedType.upper()=='n':
-        print('Knight Captured')
         return 320
     elif capturedType.upper()=='B':
-        print('Bishop Captured')
         return 330
     elif capturedType.upper()=='R':
-        print('Rook Captured')
         return 500
     elif capturedType.upper()=='Q':
-        print('Queen Captured')
         return 900
     elif capturedType.upper()=='K':
-        print('Check Mate')
         return 20000
     else:
         return 0
@@ -163,8 +157,6 @@ def evaluateScore(board,chessToIndex):
     # Get piece type of the piece that was just moved. Cast into a string.
     pieceType=str(board.piece_at(chessToIndex[moveFromSquare]))
 
-    print(evalType(pieceType,moveFromIndex))
-    print(evalBlunder(board,moveToIndex,pieceType))
     score=evalCapture(capturedType)+evalType(pieceType,moveFromIndex)+evalBlunder(board,moveToIndex,pieceType)
     return score
 
