@@ -151,7 +151,7 @@ def evaluateScore(board,chessToIndex):
     moveFromSquare=str(move)[:2]
     moveToSquare=str(move)[2:]
 
-    # Change the string moveFromIndex/moveToIndex to an integer to be compatible with methods in the library. i.e (a1 = 0, a=7,...)
+    # Change the string moveFromIndex/moveToIndex to an integer to be compatible with methods in the library. i.e (a1 = 0, a2=7,...)
     moveFromIndex=chessToIndex[moveFromSquare]
     moveToIndex=chessToIndex[moveToSquare]
 
