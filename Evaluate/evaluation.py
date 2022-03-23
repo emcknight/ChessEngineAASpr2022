@@ -186,7 +186,7 @@ def evalCapture(capturedType):
     'Returns a score for capturing different pieces on the board that are valued differently'
     if capturedType.upper()=='P':
         return 100
-    elif capturedType.upper()=='n':
+    elif capturedType.upper()=='N':
         return 320
     elif capturedType.upper()=='B':
         return 330
