@@ -93,7 +93,7 @@ def countIsoPawns(pawns):
 
     for pawn in pawns:
         for dif in differenceRange:
-            if pawn + dif in pawns:
+            if pawn + dif >= 0 and pawn + dif < 64 and pawn + dif in pawns:
                 returnResult = returnResult + 1
                 break
 

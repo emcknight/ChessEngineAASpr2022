@@ -59,10 +59,10 @@ def minipos():
         values_black.append(avg_black)
     with open('minipos_white.txt', 'w') as f:
         for runtime in values_white:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     with open('minipos_black.txt', 'w') as f:
         for runtime in values_black:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     print('Finished minimax with position evaluation')
 
     turn_counter.clear()
@@ -109,10 +109,10 @@ def minimat():
         values_black.append(avg_black)
     with open('minimat_white.txt', 'w') as f:
         for runtime in values_white:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     with open('minimat_black.txt', 'w') as f:
         for runtime in values_black:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     print('Finished minimax with material evaluation')
 
     turn_counter.clear()
@@ -159,10 +159,10 @@ def miniABpos():
         values_black.append(avg_black)
     with open('miniABpos_white.txt', 'w') as f:
         for runtime in values_white:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     with open('miniABpos_black.txt', 'w') as f:
         for runtime in values_black:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     print('Finished minimax alpha beta with position evaluation')
 
     turn_counter.clear()
@@ -209,10 +209,10 @@ def miniABmat():
         values_black.append(avg_black)
     with open('miniABmat_white.txt', 'w') as f:
         for runtime in values_white:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     with open('miniABmat_black.txt', 'w') as f:
         for runtime in values_black:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     print('Finished minimax alpha beta with material evaluation')
 
     turn_counter.clear()
@@ -259,10 +259,10 @@ def negapos():
         values_black.append(avg_black)
     with open('negapos_white.txt', 'w') as f:
         for runtime in values_white:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     with open('negapos_black.txt', 'w') as f:
         for runtime in values_black:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     print('Finished negamax with position evaluation')
 
     turn_counter.clear()
@@ -309,10 +309,10 @@ def negamat():
         values_black.append(avg_black)
     with open('negamat_white.txt', 'w') as f:
         for runtime in values_white:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     with open('negamat_black.txt', 'w') as f:
         for runtime in values_black:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     print('Finished negamax with material evaluation')
 
     turn_counter.clear()
@@ -359,10 +359,10 @@ def alphapos():
         values_black.append(avg_black)
     with open('alphapos_white.txt', 'w') as f:
         for runtime in values_white:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     with open('alphapos_black.txt', 'w') as f:
         for runtime in values_black:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     print('Finished alpha beta with position evaluation')
 
     turn_counter.clear()
@@ -409,57 +409,15 @@ def alphamat():
         values_black.append(avg_black)
     with open('alphamat_white.txt', 'w') as f:
         for runtime in values_white:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     with open('alphamat_black.txt', 'w') as f:
         for runtime in values_black:
-            f.write(str(runtime))
+            f.write(str(runtime)+'\n')
     print('Finished alpha beta with material evaluation')
 
     turn_counter.clear()
     player_runtimes.clear()
     enemy_runtimes.clear()
-
-
-def main():
-    recursion_limit = sys.getrecursionlimit()
-    sys.setrecursionlimit(100000)
-
-    print('Starting testing...')
-
-    # Test minimax with position evaluation
-    minipos()
-    gc.collect()
-
-    # Test minimax with material evaluation
-    #minimat()
-    #gc.collect()
-
-    # Test minimax w/ alpha-beta pruning with position evaluation
-    miniABpos()
-    gc.collect()
-
-    # Test minimax w/ alpha-beta pruning with material evaluation
-    #miniABmat()
-    #gc.collect()
-
-    # Test negamax with position evaluation
-    negapos()
-    gc.collect()
-
-    # Test negamax with material evaluation
-    #negamat()
-    #gc.collect()
-
-    # Test negamax w/ alpha-beta pruning with position evaluation
-    alphapos()
-    gc.collect()
-
-    # Test negamax w/ alpha-beta pruning with material evaluation
-    #alphamat()
-    #gc.collect()
-
-    print('Finished testing.')
-    sys.setrecursionlimit(recursion_limit)
 
 
 def displaystats():
@@ -468,33 +426,41 @@ def displaystats():
     values_white = list()
     values_black = list()
     with open('minipos_white.txt', 'r') as f:
-        values_white.append(float(f.readline()))
+        for line in f:
+            values_white.append(float(line.strip()))
     with open('minipos_black.txt', 'r') as f:
-        values_black.append(float(f.readline()))
+        for line in f:
+            values_black.append(float(line.strip()))
     avg_runtimes['minipos'] = [values_white.copy(), values_black.copy]
     values_white.clear()
     values_black.clear()
 
     with open('miniABpos_white.txt', 'r') as f:
-        values_white.append(float(f.readline()))
+        for line in f:
+            values_white.append(float(line.strip()))
     with open('miniABpos_black.txt', 'r') as f:
-        values_black.append(float(f.readline()))
+        for line in f:
+            values_black.append(float(line.strip()))
     avg_runtimes['miniABpos'] = [values_white.copy(), values_black.copy]
     values_white.clear()
     values_black.clear()
 
     with open('negapos_white.txt', 'r') as f:
-        values_white.append(float(f.readline()))
+        for line in f:
+            values_white.append(float(line.strip()))
     with open('negapos_black.txt', 'r') as f:
-        values_black.append(float(f.readline()))
+        for line in f:
+            values_black.append(float(line.strip()))
     avg_runtimes['negapos'] = [values_white.copy(), values_black.copy]
     values_white.clear()
     values_black.clear()
 
     with open('alphapos_white.txt', 'r') as f:
-        values_white.append(float(f.readline()))
+        for line in f:
+                values_white.append(float(line.strip()))
     with open('alphapos_black.txt', 'r') as f:
-        values_black.append(float(f.readline()))
+        for line in f:
+            values_black.append(float(line.strip()))
     avg_runtimes['alphapos'] = [values_white.copy(), values_black.copy]
     values_white.clear()
     values_black.clear()
@@ -587,11 +553,18 @@ def displaystats():
 
 
 if __name__ == '__main__':
+    recursion_limit = sys.getrecursionlimit()
+    sys.setrecursionlimit(100000)
     print('Starting tests...')
     #minipos()
-    miniABpos()
-    #negapos()
+    #minimat()
+    #miniABpos()
+    #miniABmat()
+    negapos()
+    #negamat()
     #alphapos()
+    #alphamat()
     print('Finished testing.')
     print('Visualizing data...')
     #displaystats()
+    sys.setrecursionlimit(recursion_limit)
