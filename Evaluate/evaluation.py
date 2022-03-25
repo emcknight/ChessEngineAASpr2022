@@ -8,6 +8,19 @@ import chess
 # Source for evaluation criteria:
 # https://www.chessprogramming.org/Simplified_Evaluation_Function
 
+# Chess location to index dictionary.
+chessToIndex={
+        'a8':56,'b8':57,'c8':58,'d8':59,'e8':60,'f8':61,'g8':62,'h8':63,
+        'a7':48,'b7':49,'c7':50,'d7':51,'e7':52,'f7':53,'g7':54,'h7':55,
+        'a6':40,'b6':41,'c6':42,'d6':43,'e6':44,'f6':45,'g6':46,'h6':47,
+        'a5':32,'b5':33,'c5':34,'d5':35,'e5':36,'f5':37,'g5':38,'h5':39,
+        'a4':24,'b4':25,'c4':26,'d4':27,'e4':28,'f4':29,'g4':30,'h4':31,
+        'a3':16,'b3':17,'c3':18,'d3':19,'e3':20,'f3':21,'g3':22,'h3':23,
+        'a2':8, 'b2':9, 'c2':10,'d2':11,'e2':12,'f2':13,'g2':14,'h2':15,
+        'a1':0, 'b1':1, 'c1':2, 'd1':3, 'e1':4, 'f1':5, 'g1':6, 'h1':7
+}
+
+
 def evalPawnWhite(moveToIndex,turn):
     'Returns evaluation score for where a Pawn is best on the board'
     if turn==True:
@@ -207,8 +220,8 @@ def evalBlunder(board,moveToIndex,pieceType,turn):
     else:
         if board.attackers(chess.BLACK,moveToIndex) is not None:
             return -evalCapture(pieceType)
-    
-def evaluateScore(board,chessToIndex):
+
+def evaluateScore(board, index = chessToIndex):
     'Aggregates the total score from evalCapture and evalType'
     # Set "move" to the latest move
     move = board.move_stack[-1]
@@ -222,8 +235,8 @@ def evaluateScore(board,chessToIndex):
     moveToSquare=str(move)[2:]
 
     # Change the string moveFromIndex/moveToIndex to an integer to be compatible with methods in the library. i.e (a1 = 0, a2=7,...)
-    moveFromIndex=chessToIndex[moveFromSquare]
-    moveToIndex=chessToIndex[moveToSquare]
+    moveFromIndex=index[moveFromSquare]
+    moveToIndex=index[moveToSquare]
 
     # Undo move to check if there was a piece captured before move was made (String capturedType) then push the move back to the board.
     board.pop()
@@ -236,14 +249,3 @@ def evaluateScore(board,chessToIndex):
     score=evalCapture(capturedType)+evalType(pieceType,moveFromIndex,turn)+evalBlunder(board,moveToIndex,pieceType,turn)
     return score
 
-# Chess location to index dictionary.
-chessToIndex={
-        'a8':56,'b8':57,'c8':58,'d8':59,'e8':60,'f8':61,'g8':62,'h8':63,
-        'a7':48,'b7':49,'c7':50,'d7':51,'e7':52,'f7':53,'g7':54,'h7':55,
-        'a6':40,'b6':41,'c6':42,'d6':43,'e6':44,'f6':45,'g6':46,'h6':47,
-        'a5':32,'b5':33,'c5':34,'d5':35,'e5':36,'f5':37,'g5':38,'h5':39,
-        'a4':24,'b4':25,'c4':26,'d4':27,'e4':28,'f4':29,'g4':30,'h4':31,
-        'a3':16,'b3':17,'c3':18,'d3':19,'e3':20,'f3':21,'g3':22,'h3':23,
-        'a2':8, 'b2':9, 'c2':10,'d2':11,'e2':12,'f2':13,'g2':14,'h2':15,
-        'a1':0, 'b1':1, 'c1':2, 'd1':3, 'e1':4, 'f1':5, 'g1':6, 'h1':7
-}

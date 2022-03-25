@@ -3,79 +3,79 @@ from chess import *
 
 # Initialize evaluation with current move. (Maybe just make this a method for a parent object?)
 # This algorithm assumes 'myColor' is the person whose turn it is.
-def calculate(self, board: chess.Board):
-    self.board = board
-    self.myColor = board.turn
-    self.enemyColor = not board.turn
+def calculate(board: chess.Board):
+    myColor = board.turn
+    enemyColor = not board.turn
 
-    allMyPieces: list[int] = []
-    allTheirPieces: list[int] = []
+    allMyPieces = set()
+    allTheirPieces = set()
 
     # Kings
-    myKings = board.pieces(KING, self.myColor)
-    theirKings = board.pieces(KING, self.enemyColor)
+    myKings = board.pieces(KING, myColor)
+    theirKings = board.pieces(KING, enemyColor)
 
-    self.kingWt = len(myKings) - len(theirKings)
+    kingWt = len(myKings) - len(theirKings)
 
-    allMyPieces.append(myKings)
-    allTheirPieces.append(theirKings)
+    allMyPieces.union(myKings)
+    allTheirPieces.union(theirKings)
 
     # Queens
-    myQueens = board.pieces(QUEEN, self.myColor)
-    theirQueens = board.pieces(QUEEN, self.enemyColor)
+    myQueens = board.pieces(QUEEN, myColor)
+    theirQueens = board.pieces(QUEEN, enemyColor)
 
-    self.queenWt = len(myQueens) - len(theirQueens)
+    queenWt = len(myQueens) - len(theirQueens)
 
-    allMyPieces.append(myQueens)
-    allTheirPieces.append(theirQueens)
+    allMyPieces.union(myQueens)
+    allTheirPieces.union(theirQueens)
 
     # Rooks
-    myRooks = board.pieces(ROOK, self.myColor)
-    theirRooks = board.pieces(ROOK, self.enemyColor)
+    myRooks = board.pieces(ROOK, myColor)
+    theirRooks = board.pieces(ROOK, enemyColor)
 
-    self.rookWt = len(myRooks) - len(theirRooks)
+    rookWt = len(myRooks) - len(theirRooks)
 
-    allMyPieces.append(myRooks)
-    allTheirPieces.append(theirRooks)
+    allMyPieces.union(myRooks)
+    allTheirPieces.union(theirRooks)
 
     # Bishops
-    myBishops = board.pieces(BISHOP, self.myColor)
-    theirBishops = board.pieces(BISHOP, self.enemyColor)
+    myBishops = board.pieces(BISHOP, myColor)
+    theirBishops = board.pieces(BISHOP, enemyColor)
 
-    self.bishWt = len(myBishops) - len(theirBishops)
+    bishWt = len(myBishops) - len(theirBishops)
 
-    allMyPieces.append(myBishops)
-    allTheirPieces.append(theirBishops)
+    allMyPieces.union(myBishops)
+    allTheirPieces.union(theirBishops)
 
     # Knights
-    myKnights = board.pieces(KNIGHT, self.myColor)
-    theirKnights = board.pieces(KNIGHT, self.enemyColor)
+    myKnights = board.pieces(KNIGHT, myColor)
+    theirKnights = board.pieces(KNIGHT, enemyColor)
 
-    self.kntWt = len(myKnights) - len(theirKnights)
+    kntWt = len(myKnights) - len(theirKnights)
 
-    allMyPieces.append(myKnights)
-    allTheirPieces.append(theirKnights)
+    allMyPieces.union(myKnights)
+    allTheirPieces.union(theirKnights)
 
     # Pawns
-    myPawns = board.pieces(PAWN, self.myColor)
-    theirPawns = board.pieces(PAWN, self.enemyColor)
+    myPawns = board.pieces(PAWN,myColor)
+    theirPawns = board.pieces(PAWN, enemyColor)
 
-    self.pawnWt = len(myPawns) - len(theirPawns)
-    self.dblPawnWt = self.countDblPawns(myPawns) - self.countDblPawns(theirPawns)
-    self.isoPawnWt = self.countIsoPawns(myPawns) - self.countIsoPawns(theirPawns)
+    pawnWt = len(myPawns) - len(theirPawns)
+    dblPawnWt = countDblPawns(myPawns) - countDblPawns(theirPawns)
+    isoPawnWt = countIsoPawns(myPawns) - countIsoPawns(theirPawns)
 
-    allMyPieces.append(myPawns)
-    allTheirPieces.append(theirPawns)
+    allMyPieces.union(myPawns)
+    allTheirPieces.union(theirPawns)
 
-    allMoves = board.legal_moves()
-    self.blkdPawnWt = self.countBlkdPawns(myPawns, allMoves) - self.countBlkdPawns(theirPawns, allMoves)
-    self.mvmntWt = self.countMoves(allMyPieces, allMoves) - self.countMoves(allTheirPieces, allMoves)
+    allMoves = board.legal_moves
+    blkdPawnWt = countBlkdPawns(myPawns, allMoves) - countBlkdPawns(theirPawns, allMoves)
+    mvmntWt = countMoves(allMyPieces, allMoves) - countMoves(allTheirPieces, allMoves)
 
-    return (200 * self.kingWt) + (9 * self.queenWt) + (5 * self.rookWt) + (3 * (self.kntWt + self.bishWt)) + self.pawnWt\
-           - (0.5 * (self.dblPawnWt + self.blkdPawnWt + self.isoPawnWt)) + (0.1 * self.mvmntWt)
+    return (200 * kingWt) + (9 * queenWt) + (5 * rookWt) + (3 * (kntWt + bishWt)) + pawnWt\
+           - (0.5 * (dblPawnWt + blkdPawnWt + isoPawnWt)) + (0.1 * mvmntWt)
+
 
 # Counts doubled pawns from set. Doubled pawns are stacked in the same column
-def countDblPawns(self, pawns: set):
+def countDblPawns(pawns):
     returnResult = 0
 
     for pawn in pawns:
@@ -84,8 +84,9 @@ def countDblPawns(self, pawns: set):
 
     return returnResult
 
+
 # Counts isolated pawns from set. Isolated pawns are not adjacent (horizontally, vertically, or diagonally) to another pawn of the same color
-def countIsoPawns(self, pawns: set):
+def countIsoPawns(pawns):
     returnResult = 0
 
     differenceRange = [-9, -8, -7, -1, 1, 7, 8, 9]
@@ -98,8 +99,9 @@ def countIsoPawns(self, pawns: set):
 
     return returnResult
 
+
 # Counts blocked pawns from set. Blocked pawns cannot make a legal move
-def countBlkdPawns(self, pawns: set, legalMoves: set):
+def countBlkdPawns(pawns, legalMoves):
     returnResult = 0
 
     for pawn in pawns:
@@ -109,7 +111,8 @@ def countBlkdPawns(self, pawns: set, legalMoves: set):
 
     return returnResult
 
-def countMoves(self, pieces: set, legalMoves: set):
+
+def countMoves(pieces, legalMoves):
     returnResult = 0
 
     for piece in pieces:

@@ -71,20 +71,20 @@ def alphaBeta(board: chess.Board, depth: int, evaluation):
     return selected_move
 
 
-def minimax(depth: int, board: chess.Board):
+def minimax(board: chess.Board, depth: int, evaluation):
     # the function board.turn returns True if it's White's turn to move and False if its Black's
     # therefore we can use this function to determine if it should be max() or min()'s turn, with
     # max referring to finding white's best move, and min referring to finding black's best move
 
     if board.turn:
-        bestmove = searchMax(depth, board)
+        bestmove = searchMax(depth, board, evaluation)
     else:
-        bestmove = searchMin(depth, board)
+        bestmove = searchMin(depth, board, evaluation)
 
-    return bestmove
+    return bestmove[1]
 
 
-def minimaxAB(depth: int, board: chess.Board):
+def minimaxAB(board: chess.Board, depth: int, evaluation):
     # the function board.turn returns True if it's White's turn to move and False if its Black's
     # therefore we can use this function to determine if it should be max() or min()'s turn, with
     # max referring to finding white's best move, and min referring to finding black's best move
@@ -94,8 +94,8 @@ def minimaxAB(depth: int, board: chess.Board):
     beta = float('inf')
 
     if board.turn:
-        bestmove = maxAB(depth, board, alpha, beta)
+        bestmove = maxAB(depth, board, alpha, beta, evaluation)
     else:
-        bestmove = minAB(depth, board, alpha, beta)
+        bestmove = minAB(depth, board, alpha, beta, evaluation)
 
-    return bestmove
+    return bestmove[1]
