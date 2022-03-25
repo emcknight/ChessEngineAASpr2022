@@ -232,7 +232,7 @@ def evaluateScore(board, index = chessToIndex):
     # Set moveFromSquare to the original position of piece before movement. Set moveToSquare to the original piece after movement. Cast into a string for both.
     # Note: Move is an object in form of "a2a3". Where a2 is original position and a3 is ending position.
     moveFromSquare=str(move)[:2]
-    moveToSquare=str(move)[2:]
+    moveToSquare=str(move)[2:4]
 
     # Change the string moveFromIndex/moveToIndex to an integer to be compatible with methods in the library. i.e (a1 = 0, a2=7,...)
     moveFromIndex=index[moveFromSquare]

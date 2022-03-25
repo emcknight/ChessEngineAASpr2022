@@ -17,7 +17,7 @@ def negamaxUtil(board: chess.Board, depth: int, evaluation):
     """
 
     if depth == 0 or board.outcome() is not None:
-        evaluation(board)
+        return evaluation(board)
 
     maximum = float('-inf')
     for move in board.legal_moves:
@@ -41,7 +41,7 @@ def alphaBetaUtil(board: chess.Board, alpha: float, beta: float, depth: int, eva
     """
 
     if depth == 0 or board.outcome() is not None:
-        evaluation(board)
+        return evaluation(board)
 
     for move in board.legal_moves:
         board.push(move)
