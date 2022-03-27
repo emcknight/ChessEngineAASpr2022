@@ -260,7 +260,7 @@ def displaystats():
     # Display runtime information
     print('Visualizing runtimes...')
     figure, axs = plt.subplots(3)
-    figure.set_title('Avg runtime of search and evaluation function pairs for both players')
+    figure.suptitle('Avg runtime of search and evaluation function pairs for both players')
 
     # Plot runtimes for white
     y = avg_runtimes['minitest'][0]
@@ -324,13 +324,13 @@ def displaystats():
 
 
 if __name__ == '__main__':
-    print('Starting tests...')
+    """print('Starting tests...')
     minitest()
     miniABtest()
     negatest()
     alphatest()
     evaltest()
     print('Finished testing.')
-    print('Visualizing data...')
+    print('Visualizing data...')"""
     displaystats()
 
