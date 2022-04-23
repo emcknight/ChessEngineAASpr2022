@@ -5,53 +5,39 @@
 # Version:      1.0
 
 import chess
+import hashlib
 
 
-def negamaxUtil(board: chess.Board, depth: int, evaluation):
-    """
-    Recursive utility function for the root negamax function.
-    :param board: The board to evaluate and make temporary moves on.
-    :param depth: The max depth to traverse.
-    :param evaluation: The evaluation function to perform on the board at depth = 0.
-    :return: The maximum score from the subtree.
-    """
-
-    if depth == 0 or board.outcome() is not None:
-        return evaluation(board)
-
-    maximum = float('-inf')
-    for move in board.legal_moves:
-        board.push(move)
-        score = -negamaxUtil(board, depth-1, evaluation)
-        board.pop()
-        if score > maximum:
-            maximum = score
-    return maximum
+class MemoNode:
+    def __init__(self, move, depth, score, node_type, age):
+        self.move = move
+        self.depth = depth
+        self.score = score
+        self.node_type = node_type
+        self.age = age
 
 
-def alphaBetaUtil(board: chess.Board, alpha: float, beta: float, depth: int, evaluation):
-    """
-    Recursive utility function for the root alphaBeta function.
-    :param board: The board to evaluate and make temporary moves on.
-    :param alpha: The minimum score for the maximizing player
-    :param beta: The maximum score for the minimizing player
-    :param depth: The max depth to traverse.
-    :param evaluation: The evaluation function to perform on the board.
-    :return: The maximum score from the subtree
-    """
+class Memo:
+    def __init__(self):
+        self.table = dict()
 
-    if depth == 0 or board.outcome() is not None:
-        return evaluation(board)
+    def hash(self, fen: str):
+        return int.from_bytes(hashlib.sha256(bytes(fen, encoding='utf8')).digest()[:8], 'little')
 
-    for move in board.legal_moves:
-        board.push(move)
-        score = -alphaBetaUtil(board, -beta, -alpha, depth-1, evaluation)
-        board.pop()
-        if score >= beta:
-            return beta
-        if score > alpha:
-            alpha = score
-    return alpha
+    def lookup(self, fen):
+        key = self.hash(fen)
+        if key in self.table:
+            return self.table[key]
+        return None
+
+    def store(self, fen, move, depth, score, node_type, age):
+        key = self.hash(fen)
+        if key not in self.table:
+            self.table[key] = MemoNode(move, depth, score, node_type, age)
+            return
+
+        if age > self.table[key].age:
+            self.table[key] = MemoNode(move, depth, score, node_type, age)
 
 
 def searchMax(depth, board: chess.Board, evaluation):
