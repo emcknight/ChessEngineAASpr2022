@@ -5,23 +5,25 @@
 # Version:      1.0
 
 import chess
-from Search import alphaBeta
-from Evaluate import calculate
+from Search import iterativedeepening
+from Evaluate import eval, calculate, evaluateScore
+from Utilities import Memo
 
 
 class Engine:
     def __init__(self, board: chess.Board, white: bool):
         self.color = white
-        self.search = alphaBeta
+        self.search = iterativedeepening
         self.eval = calculate
         self.board = board
+        self.memo = Memo()
 
     def opponent_move(self, uci: str):
         move = self.board.parse_uci(uci)
         self.board.push(move)
 
     def make_move(self):
-        move = self.search(self.board, 4, self.eval)
+        _, move = self.search(10, 5, self.board, self.eval, self.memo)
         self.board.push(move)
         return move.uci()
 

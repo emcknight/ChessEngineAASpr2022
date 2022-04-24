@@ -1,11 +1,17 @@
+# Project:      ChessEngineAASpr2022
+# Author:       Joshua Brock
+# Date:         03/16/2022
+# Last Updated: 04/24/2022
+# Version:      1.1
+
 import chess
 from chess import *
 
 # Initialize evaluation with current move. (Maybe just make this a method for a parent object?)
 # This algorithm assumes 'myColor' is the person whose turn it is.
-def calculate(board: chess.Board):
-    myColor = board.turn
-    enemyColor = not board.turn
+def calculate(board: chess.Board, color):
+    myColor = color
+    enemyColor = not color
 
     allMyPieces = set()
     allTheirPieces = set()

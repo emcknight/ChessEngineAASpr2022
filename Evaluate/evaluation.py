@@ -221,13 +221,13 @@ def evalBlunder(board,moveToIndex,pieceType,turn):
         if board.attackers(chess.BLACK,moveToIndex) is not None:
             return -evalCapture(pieceType)
 
-def evaluateScore(board, index = chessToIndex):
+def evaluateScore(board, color, index = chessToIndex):
     'Aggregates the total score from evalCapture and evalType'
     # Set "move" to the latest move
     move = board.move_stack[-1]
 
     # Find out if Black or White made the most recent movement
-    turn = not board.turn
+    turn = not color
 
     # Set moveFromSquare to the original position of piece before movement. Set moveToSquare to the original piece after movement. Cast into a string for both.
     # Note: Move is an object in form of "a2a3". Where a2 is original position and a3 is ending position.
