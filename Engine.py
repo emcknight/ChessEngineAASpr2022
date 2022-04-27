@@ -14,7 +14,7 @@ class Engine:
     def __init__(self, board: chess.Board, white: bool):
         self.color = white
         self.search = iterativedeepening
-        self.eval = eval
+        self.eval = calculateRapid
         self.board = board
         self.memo = Memo()
 

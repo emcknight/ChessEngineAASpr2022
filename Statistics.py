@@ -31,7 +31,7 @@ def minitest():
 
             # White move
             start = time.time()
-            _, move = minimax(board, 3, eval)
+            _, move = minimax(board, 3, calculateRapid)
             stop = time.time()
             board.push(move)
 
@@ -39,7 +39,7 @@ def minitest():
 
             # Black move
             start = time.time()
-            _, move = minimax(board, 3, eval)
+            _, move = minimax(board, 3, calculateRapid)
             stop = time.time()
             board.push(move)
 
@@ -77,7 +77,7 @@ def miniABtest():
 
             # White move
             start = time.time()
-            _, move = minimaxAB(board, 3, eval)
+            _, move = minimaxAB(board, 3, calculateRapid)
             stop = time.time()
             board.push(move)
 
@@ -85,7 +85,7 @@ def miniABtest():
 
             # Black move
             start = time.time()
-            _, move = minimaxAB(board, 3, eval)
+            _, move = minimaxAB(board, 3, calculateRapid)
             stop = time.time()
             board.push(move)
 
@@ -123,7 +123,7 @@ def negatest():
 
             # White move
             start = time.time()
-            _, move = negamax(3, board, board.turn, eval)
+            _, move = negamax(3, board, board.turn, calculateRapid)
             stop = time.time()
             board.push(move)
 
@@ -131,7 +131,7 @@ def negatest():
 
             # Black move
             start = time.time()
-            _, move = negamax(3, board, board.turn, eval)
+            _, move = negamax(3, board, board.turn, calculateRapid)
             stop = time.time()
             board.push(move)
 
@@ -169,7 +169,7 @@ def alphatest():
 
             # White move
             start = time.time()
-            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, eval)
+            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, calculateRapid)
             stop = time.time()
             board.push(move)
 
@@ -177,7 +177,7 @@ def alphatest():
 
             # Black move
             start = time.time()
-            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, eval)
+            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, calculateRapid)
             stop = time.time()
             board.push(move)
 
@@ -217,7 +217,7 @@ def tabulartest():
 
             # White move
             start = time.time()
-            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, eval, w_memo)
+            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, calculateRapid, w_memo)
             stop = time.time()
             board.push(move)
 
@@ -225,7 +225,7 @@ def tabulartest():
 
             # Black move
             start = time.time()
-            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, eval, b_memo)
+            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, calculateRapid, b_memo)
             stop = time.time()
             board.push(move)
 
@@ -265,7 +265,7 @@ def idtest():
 
             # White move
             start = time.time()
-            _, move = iterativedeepening(3, 5, board, eval, w_memo)
+            _, move = iterativedeepening(3, 5, board, calculateRapid, w_memo)
             stop = time.time()
             board.push(move)
 
@@ -273,7 +273,7 @@ def idtest():
 
             # Black move
             start = time.time()
-            _, move = iterativedeepening(3, 5, board, eval, b_memo)
+            _, move = iterativedeepening(3, 5, board, calculateRapid, b_memo)
             stop = time.time()
             board.push(move)
 
