@@ -13,17 +13,11 @@ def calculate(board: chess.Board, color):
     myColor = color
     enemyColor = not color
 
-    allMyPieces = SquareSet()
-    allTheirPieces = SquareSet()
-
     # Kings
     myKings = board.pieces(KING, myColor)
     theirKings = board.pieces(KING, enemyColor)
 
     kingWt = len(myKings) - len(theirKings)
-
-    allMyPieces = allMyPieces.union(myKings)
-    allTheirPieces = allTheirPieces.union(theirKings)
 
     # Queens
     myQueens = board.pieces(QUEEN, myColor)
@@ -31,17 +25,11 @@ def calculate(board: chess.Board, color):
 
     queenWt = len(myQueens) - len(theirQueens)
 
-    allMyPieces = allMyPieces.union(myQueens)
-    allTheirPieces = allTheirPieces.union(theirQueens)
-
     # Rooks
     myRooks = board.pieces(ROOK, myColor)
     theirRooks = board.pieces(ROOK, enemyColor)
 
     rookWt = len(myRooks) - len(theirRooks)
-
-    allMyPieces = allMyPieces.union(myRooks)
-    allTheirPieces = allTheirPieces.union(theirRooks)
 
     # Bishops
     myBishops = board.pieces(BISHOP, myColor)
@@ -49,17 +37,11 @@ def calculate(board: chess.Board, color):
 
     bishWt = len(myBishops) - len(theirBishops)
 
-    allMyPieces = allMyPieces.union(myBishops)
-    allTheirPieces = allTheirPieces.union(theirBishops)
-
     # Knights
     myKnights = board.pieces(KNIGHT, myColor)
     theirKnights = board.pieces(KNIGHT, enemyColor)
 
     kntWt = len(myKnights) - len(theirKnights)
-
-    allMyPieces = allMyPieces.union(myKnights)
-    allTheirPieces = allTheirPieces.union(theirKnights)
 
     # Pawns
     myPawns = board.pieces(PAWN,myColor)
@@ -69,12 +51,16 @@ def calculate(board: chess.Board, color):
     dblPawnWt = countDblPawns(myPawns) - countDblPawns(theirPawns)
     isoPawnWt = countIsoPawns(myPawns) - countIsoPawns(theirPawns)
 
-    allMyPieces = allMyPieces.union(myPawns)
-    allTheirPieces = allTheirPieces.union(theirPawns)
+    myMoves = list(board.legal_moves)
+    theirMoves = list()
 
-    allMoves = list(board.legal_moves)
-    blkdPawnWt = countBlkdPawns(myPawns, allMoves) - countBlkdPawns(theirPawns, allMoves)
-    mvmntWt = countMoves(allMyPieces, allMoves) - countMoves(allTheirPieces, allMoves)
+    if len(myMoves) > 0:
+        board.push(myMoves[0])
+        theirMoves = list(board.legal_moves)
+        board.pop()
+
+    blkdPawnWt = countBlkdPawns(myPawns, myMoves) - countBlkdPawns(theirPawns, theirMoves)
+    mvmntWt = len(myMoves) - len(theirMoves)
 
     return (200 * kingWt) + (9 * queenWt) + (5 * rookWt) + (3 * (kntWt + bishWt)) + pawnWt\
            - (0.5 * (dblPawnWt + blkdPawnWt + isoPawnWt)) + (0.1 * mvmntWt)

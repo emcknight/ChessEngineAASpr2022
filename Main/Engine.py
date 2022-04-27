@@ -23,7 +23,7 @@ class Engine:
         self.board.push(move)
 
     def make_move(self):
-        _, move = self.search(10, 5, self.board, self.eval, self.memo)
+        _, move = self.search(30, 5, self.board, self.eval, self.memo)
         self.board.push(move)
         return move.uci()
 
