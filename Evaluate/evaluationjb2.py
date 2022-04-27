@@ -1,3 +1,5 @@
+import math
+
 import chess
 from chess import *
 
@@ -16,9 +18,9 @@ chessToIndex = {
 # Initialize evaluation with current move. (Maybe just make this a method for a parent object?)
 # This algorithm assumes 'myColor' is the person whose turn it is.
 # Evaluates in 4 parts: Material, King Safety, Control of Center, and possible Activity
-def calculate(board: chess.Board):
-    myColor = board.turn
-    enemyColor = not board.turn
+def calculateRapid(board: chess.Board, color):
+    myColor = color
+    enemyColor = not color
 
     allMyPieces = set()
     allTheirPieces = set()
@@ -67,7 +69,7 @@ def calculate(board: chess.Board):
 
     allMyPieces = allMyPieces.union(myPawns)
     allTheirPieces = allTheirPieces.union(theirPawns)
-        
+
     # ------------------------------------------------------------------------------------------------------------------
     # Gets the material score.
     kingWt = len(myKings) - len(theirKings)
@@ -81,17 +83,47 @@ def calculate(board: chess.Board):
 
     # ------------------------------------------------------------------------------------------------------------------
     # Gets the activity score. Here I'm comparing the average number of moves per piece.
-    allMoves = board.legal_moves
+    if board.turn == myColor:
+        myMoves = list(board.legal_moves)
+        theirMoves = list()
+    else:
+        theirMoves = list(board.legal_moves)
+        myMoves = list()
 
-    myMoves = countMoves(allMyPieces, allMoves)
-    theirMoves = countMoves(allTheirPieces, allMoves)
+    if board.turn == myColor:
+        if len(myMoves) > 0:
+            board.push(myMoves[0])
+            theirMoves = list(board.legal_moves)
+            board.pop()
+    else:
+        if len(theirMoves) > 0:
+            board.push(theirMoves[0])
+            myMoves = list(board.legal_moves)
+            board.pop()
 
-    activityVal = (myMoves / len(allMyPieces)) - (theirMoves / len(allTheirPieces))
+    activityVal = 0
+
+    if (allMyPieces == 0 and allTheirPieces == 0):
+        activityVal = 0
+    elif (allMyPieces == 0):
+        activityVal = -1 * len(theirMoves) / len(allTheirPieces)
+    elif (allTheirPieces == 0):
+        activityVal = len(myMoves) / len(allMyPieces)
+    else:
+        activityVal = (len(myMoves) / len(allMyPieces)) - (len(theirMoves) / len(allTheirPieces))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Gets the center control. How many pawns are in a4 to h5.
-    myControl = len(16 + x == piece for piece in myPawns for x in range(16))
-    theirControl = len(16 + x == piece for piece in theirPawns for x in range(16))
+    myControl = 0
+    theirControl = 0
+
+    for x in range(16):
+        for piece in myPawns:
+            if piece == 16 + x:
+                myControl = myControl + 1
+        for piece in theirPawns:
+            if piece == 16 + x:
+                theirControl = theirControl + 1
 
     controlVal = myControl - theirControl
 
@@ -106,8 +138,8 @@ def calculate(board: chess.Board):
         kingSafetyVal = -2
     else:
         # Pt.1 How mobile is my King to the enemy King?
-        myEscape = len(move.from_square == piece for piece in myKings for move in allMoves)
-        theirEscape = len(move.from_square == piece for piece in theirKings for move in allMoves)
+        myEscape = countMoves(myKings, myMoves)
+        theirEscape = countMoves(theirKings, theirMoves)
         escapeVal = myEscape - theirEscape
 
         # Pt.2 How many pawns are nearby my King?
@@ -118,18 +150,20 @@ def calculate(board: chess.Board):
         myPawnShield = 0
         theirPawnShield = 0
 
-        for king in myKings:
-            for dif in fiveByFiveRange:
+        for dif in fiveByFiveRange:
+            for king in myKings:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and ((dif > 0 and math.floor((king + dif)/8 <= 2)) or (dif < 0 and math.ceil((king + dif)/8 >= -2))):
-                    myPawnShield += len(king + dif in myPawns)
+                if king + dif >= 0 and king + dif < 64 and \
+                        ((dif > 0 and math.floor((king + dif)/8 - king/dif) <= 2) or (dif < 0 and math.ceil((king + dif)/8 - king/dif) >= -2)):
+                    if king + dif in myPawns:
+                        myPawnShield = myPawnShield + 1
 
-        for king in theirKings:
-            for dif in fiveByFiveRange:
+            for king in theirKings:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and ((dif > 0 and math.floor((king + dif) / 8 <= 2)) or (
-                        dif < 0 and math.ceil((king + dif) / 8 >= -2))):
-                    theirPawnShield += len(king + dif in theirPawns)
+                if king + dif >= 0 and king + dif < 64 and \
+                        ((dif > 0 and math.floor((king + dif)/8 - king/dif) <= 2) or (dif < 0 and math.ceil((king + dif)/8 - king/dif) >= -2)):
+                    if king + dif in theirPawns:
+                        theirPawnShield = theirPawnShield + 1
 
         pawnShieldVal = myPawnShield - theirPawnShield
 
@@ -141,21 +175,22 @@ def calculate(board: chess.Board):
         myDefenders = 0
         theirDefenders = 0
 
-        for king in myKings:
-            for dif in fiveByEightRange:
+        for dif in fiveByEightRange:
+            for king in myKings:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and ((dif > 0 and math.floor((king + dif) / 8 <= 3)) or (dif < 0 and math.ceil((king + dif) / 8 >= -3))):
-                    # Don't count pawns.
-                    if not king + dif in myPawns:
-                        myDefenders += len(king + dif in allMyPieces)
+                if king + dif >= 0 and king + dif < 64:
+                    if ((dif > 0 and math.floor((king + dif)/8 - king/dif) <= 3) or (dif < 0 and math.ceil((king + dif)/8 - king/dif) >= -3)):
+                        # Don't count pawns.
+                        if king + dif in allMyPieces and not king + dif in myPawns:
+                            myDefenders = myDefenders + 1
 
-        for king in theirKings:
-            for dif in fiveByEightRange:
+            for king in theirKings:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and ((dif > 0 and math.floor((king + dif) / 8 <= 3)) or (dif < 0 and math.ceil((king + dif) / 8 >= -3))):
-                    # Don't count pawns.
-                    if not king + dif in theirPawns:
-                        myDefenders += len(king + dif in allTheirPieces)
+                if king + dif >= 0 and king + dif < 64:
+                    if ((dif > 0 and math.floor((king + dif)/8 - king/dif) <= 3) or (dif < 0 and math.ceil((king + dif)/8 - king/dif) >= -3)):
+                        # Don't count pawns.
+                        if king + dif in allTheirPieces and not king + dif in theirPawns:
+                            theirDefenders = theirDefenders + 1
 
         defenderVal = myDefenders - theirDefenders
 
@@ -163,17 +198,21 @@ def calculate(board: chess.Board):
         myAttackers = 0
         theirAttackers = 0
 
-        for king in myKings:
-            for dif in fiveByEightRange:
+        for dif in fiveByEightRange:
+            for king in myKings:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and ((dif > 0 and math.floor((king + dif) / 8 <= 3)) or (dif < 0 and math.ceil((king + dif) / 8 >= -3))):
-                    myAttackers += len(king + dif in allTheirPieces)
+                if king + dif >= 0 and king + dif < 64:
+                    if ((dif > 0 and math.floor((king + dif)/8 - king/dif) <= 3) or (dif < 0 and math.ceil((king + dif)/8 - king/dif) >= -3)):
+                        if king + dif in allTheirPieces:
+                            myAttackers = myAttackers + 1
 
-        for king in theirKings:
-            for dif in fiveByEightRange:
+            for king in theirKings:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and ((dif > 0 and math.floor((king + dif) / 8 <= 3)) or (dif < 0 and math.ceil((king + dif) / 8 >= -3))):
-                    theirAttackers += len(king + dif in allMyPieces)
+                if king + dif >= 0 and king + dif < 64:
+                    if ((dif > 0 and math.floor((king + dif)/8 - king/dif) <= 3) or (dif < 0 and math.ceil((king + dif)/8 - king/dif) >= -3)):
+                        # Don't count pawns.
+                        if king + dif in allMyPieces:
+                            theirAttackers = theirAttackers + 1
 
         # This field we want the enemy to have more of
         attackerValue = theirAttackers - myAttackers
@@ -209,7 +248,7 @@ def calculate(board: chess.Board):
                     elif king + dif in allMyPieces:
                         myProtection = myProtection + 1
                         break
-                elif index < 1:
+                elif colNegRange.index(dif) < 1:
                     myProtection = myProtection + 1
                     break
                 else:
@@ -223,7 +262,7 @@ def calculate(board: chess.Board):
                     elif king + dif in allMyPieces:
                         myProtection = myProtection + 1
                         break
-                elif index < 1:
+                elif colPosRange.index(dif) < 1:
                     myProtection = myProtection + 1
                     break
                 else:
@@ -237,7 +276,7 @@ def calculate(board: chess.Board):
                     elif king + dif in allMyPieces:
                         myProtection = myProtection + 1
                         break
-                elif index < 1:
+                elif rowNegRange.index(dif) < 1:
                     myProtection = myProtection + 1
                     break
                 else:
@@ -251,64 +290,177 @@ def calculate(board: chess.Board):
                     elif king + dif in allMyPieces:
                         myProtection = myProtection + 1
                         break
-                elif index < 1:
+                elif rowPosRange.index(dif) < 1:
                     myProtection = myProtection + 1
                     break
                 else:
                     break
 
-            for index, dif in diagTLRange:
+            for dif in diagTLRange:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == index + 1:
+                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == diagTLRange.index(dif) + 1:
                     if king + dif in allTheirPieces:
                         break
                     elif king + dif in allMyPieces:
                         myProtection = myProtection + 1
                         break
-                elif index < 1:
+                elif diagTLRange.index(dif) < 1:
                     myProtection = myProtection + 1
                     break
                 else:
                     break
 
-            for index, dif in diagTRRange:
+            for dif in diagTRRange:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == index + 1:
+                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == diagTRRange.index(dif) + 1:
                     if king + dif in allTheirPieces:
                         break
                     elif king + dif in allMyPieces:
                         myProtection = myProtection + 1
                         break
-                elif index < 1:
+                elif diagTRRange.index(dif) < 1:
                     myProtection = myProtection + 1
                     break
                 else:
                     break
 
-            for index, dif in diagBLRange:
+            for dif in diagBLRange:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == index + 1:
+                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == diagBLRange.index(dif) + 1:
                     if king + dif in allTheirPieces:
                         break
                     elif king + dif in allMyPieces:
                         myProtection = myProtection + 1
                         break
-                elif index < 1:
+                elif diagBLRange.index(dif) < 1:
                     myProtection = myProtection + 1
                     break
                 else:
                     break
 
-            for index, dif in diagBRRange:
+            for dif in diagBRRange:
                 # Ensure space difference is valid and doesn't extend outside desired range
-                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == index + 1:
+                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == diagBRRange.index(dif) + 1:
                     if king + dif in allTheirPieces:
                         break
                     elif king + dif in allMyPieces:
                         myProtection = myProtection + 1
                         break
-                elif index < 1:
+                elif diagBRRange.index(dif) < 1:
                     myProtection = myProtection + 1
+                    break
+                else:
+                    break
+
+        for king in theirKings:
+            for dif in colNegRange:
+                # Ensure space difference is valid and doesn't extend outside desired range
+                if king + dif >= 0 and king + dif < 64:
+                    if king + dif in allMyPieces:
+                        break
+                    elif king + dif in allTheirPieces:
+                        theirProtection = theirProtection + 1
+                        break
+                elif colNegRange.index(dif) < 1:
+                    theirProtection = theirProtection + 1
+                    break
+                else:
+                    break
+
+            for dif in colPosRange:
+                # Ensure space difference is valid and doesn't extend outside desired range
+                if king + dif >= 0 and king + dif < 64:
+                    if king + dif in allMyPieces:
+                        break
+                    elif king + dif in allTheirPieces:
+                        theirProtection = theirProtection + 1
+                        break
+                elif colPosRange.index(dif) < 1:
+                    theirProtection = theirProtection + 1
+                    break
+                else:
+                    break
+
+            for dif in rowNegRange:
+                # Ensure space difference is valid and doesn't extend outside desired range
+                if king + dif >= 0 and king + dif < 64 and math.floor(king + dif / 8) == math.floor(king / 8):
+                    if king + dif in allMyPieces:
+                        break
+                    elif king + dif in allTheirPieces:
+                        theirProtection = theirProtection + 1
+                        break
+                elif rowNegRange.index(dif) < 1:
+                    theirProtection = theirProtection + 1
+                    break
+                else:
+                    break
+
+            for dif in rowPosRange:
+                # Ensure space difference is valid and doesn't extend outside desired range
+                if king + dif >= 0 and king + dif < 64 and math.floor(king + dif / 8) == math.floor(king / 8):
+                    if king + dif in allMyPieces:
+                        break
+                    elif king + dif in allTheirPieces:
+                        theirProtection = theirProtection + 1
+                        break
+                elif rowPosRange.index(dif) < 1:
+                    theirProtection = theirProtection + 1
+                    break
+                else:
+                    break
+
+            for dif in diagTLRange:
+                # Ensure space difference is valid and doesn't extend outside desired range
+                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == diagTLRange.index(dif) + 1:
+                    if king + dif in allMyPieces:
+                        break
+                    elif king + dif in allTheirPieces:
+                        theirProtection = theirProtection + 1
+                        break
+                elif diagTLRange.index(dif) < 1:
+                    theirProtection = theirProtection + 1
+                    break
+                else:
+                    break
+
+            for dif in diagTRRange:
+                # Ensure space difference is valid and doesn't extend outside desired range
+                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == diagTRRange.index(dif) + 1:
+                    if king + dif in allMyPieces:
+                        break
+                    elif king + dif in allTheirPieces:
+                        theirProtection = theirProtection + 1
+                        break
+                elif diagTRRange.index(dif) < 1:
+                    theirProtection = theirProtection + 1
+                    break
+                else:
+                    break
+
+            for dif in diagBLRange:
+                # Ensure space difference is valid and doesn't extend outside desired range
+                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == diagBLRange.index(dif) + 1:
+                    if king + dif in allMyPieces:
+                        break
+                    elif king + dif in allTheirPieces:
+                        theirProtection = theirProtection + 1
+                        break
+                elif diagBLRange.index(dif) < 1:
+                    theirProtection = theirProtection + 1
+                    break
+                else:
+                    break
+
+            for dif in diagBRRange:
+                # Ensure space difference is valid and doesn't extend outside desired range
+                if king + dif >= 0 and king + dif < 64 and abs(math.floor(king + dif / 8) - math.floor(king / 8)) == diagBRRange.index(dif) + 1:
+                    if king + dif in allMyPieces:
+                        break
+                    elif king + dif in allTheirPieces:
+                        theirProtection = theirProtection + 1
+                        break
+                elif diagBRRange.index(dif) < 1:
+                    theirProtection = theirProtection + 1
                     break
                 else:
                     break
@@ -341,6 +493,7 @@ def calculate(board: chess.Board):
 
     return totalScore
 
+# Count Moves
 def countMoves(pieces, legalMoves):
     returnResult = 0
 
