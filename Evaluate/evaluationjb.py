@@ -51,13 +51,23 @@ def calculate(board: chess.Board, color):
     dblPawnWt = countDblPawns(myPawns) - countDblPawns(theirPawns)
     isoPawnWt = countIsoPawns(myPawns) - countIsoPawns(theirPawns)
 
-    myMoves = list(board.legal_moves)
-    theirMoves = list()
-
-    if len(myMoves) > 0:
-        board.push(myMoves[0])
+    if board.turn == myColor:
+        myMoves = list(board.legal_moves)
+        theirMoves = list()
+    else:
         theirMoves = list(board.legal_moves)
-        board.pop()
+        myMoves = list()
+
+    if board.turn == myColor:
+        if len(myMoves) > 0:
+            board.push(myMoves[0])
+            theirMoves = list(board.legal_moves)
+            board.pop()
+    else:
+        if len(theirMoves) > 0:
+            board.push(theirMoves[0])
+            myMoves = list(board.legal_moves)
+            board.pop()
 
     blkdPawnWt = countBlkdPawns(myPawns, myMoves) - countBlkdPawns(theirPawns, theirMoves)
     mvmntWt = len(myMoves) - len(theirMoves)
