@@ -69,6 +69,7 @@ def calculate(board: chess.Board, color):
             myMoves = list(board.legal_moves)
             board.pop()
 
+
     blkdPawnWt = countBlkdPawns(myPawns, myMoves) - countBlkdPawns(theirPawns, theirMoves)
     mvmntWt = len(myMoves) - len(theirMoves)
 
