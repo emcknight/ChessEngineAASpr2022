@@ -30,44 +30,44 @@ def calculate(board: chess.Board):
     myKings = board.pieces(KING, myColor)
     theirKings = board.pieces(KING, enemyColor)
 
-    allMyPieces.union(myKings)
-    allTheirPieces.union(theirKings)
+    allMyPieces = allMyPieces.union(myKings)
+    allTheirPieces = allTheirPieces.union(theirKings)
 
     # Queens
     myQueens = board.pieces(QUEEN, myColor)
     theirQueens = board.pieces(QUEEN, enemyColor)
 
-    allMyPieces.union(myQueens)
-    allTheirPieces.union(theirQueens)
+    allMyPieces = allMyPieces.union(myQueens)
+    allTheirPieces = allTheirPieces.union(theirQueens)
 
     # Rooks
     myRooks = board.pieces(ROOK, myColor)
     theirRooks = board.pieces(ROOK, enemyColor)
 
-    allMyPieces.union(myRooks)
-    allTheirPieces.union(theirRooks)
+    allMyPieces = allMyPieces.union(myRooks)
+    allTheirPieces = allTheirPieces.union(theirRooks)
 
     # Bishops
     myBishops = board.pieces(BISHOP, myColor)
     theirBishops = board.pieces(BISHOP, enemyColor)
 
-    allMyPieces.union(myBishops)
-    allTheirPieces.union(theirBishops)
+    allMyPieces = allMyPieces.union(myBishops)
+    allTheirPieces = allTheirPieces.union(theirBishops)
 
     # Knights
     myKnights = board.pieces(KNIGHT, myColor)
     theirKnights = board.pieces(KNIGHT, enemyColor)
 
-    allMyPieces.union(myKnights)
-    allTheirPieces.union(theirKnights)
+    allMyPieces = allMyPieces.union(myKnights)
+    allTheirPieces = allTheirPieces.union(theirKnights)
 
     # Pawns
     myPawns = board.pieces(PAWN, myColor)
     theirPawns = board.pieces(PAWN, enemyColor)
 
-    allMyPieces.union(myPawns)
-    allTheirPieces.union(theirPawns)
-
+    allMyPieces = allMyPieces.union(myPawns)
+    allTheirPieces = allTheirPieces.union(theirPawns)
+        
     # ------------------------------------------------------------------------------------------------------------------
     # Gets the material score.
     kingWt = len(myKings) - len(theirKings)
@@ -83,8 +83,8 @@ def calculate(board: chess.Board):
     # Gets the activity score. Here I'm comparing the average number of moves per piece.
     allMoves = board.legal_moves
 
-    myMoves = len(move.from_square == piece for piece in allMyPieces for move in allMoves)
-    theirMoves = len(move.from_square == piece for piece in allTheirPieces for move in allMoves)
+    myMoves = countMoves(allMyPieces, allMoves)
+    theirMoves = countMoves(allTheirPieces, allMoves)
 
     activityVal = (myMoves / len(allMyPieces)) - (theirMoves / len(allTheirPieces))
 
@@ -340,3 +340,12 @@ def calculate(board: chess.Board):
     totalScore = materialVal + activityVal + kingSafetyVal + controlVal
 
     return totalScore
+
+def countMoves(pieces, legalMoves):
+    returnResult = 0
+
+    for piece in pieces:
+        for move in legalMoves:
+            if move.from_square == piece:
+                returnResult = returnResult + 1
+    return returnResult
