@@ -5,7 +5,7 @@
 # Version:      1.0
 
 import chess
-from Evaluate import evaluateScore, calculate
+from Evaluate import evaluateScore, calculate, cl
 
 
 def eval(board: chess.Board, color):
