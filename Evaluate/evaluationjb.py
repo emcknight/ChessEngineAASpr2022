@@ -13,8 +13,8 @@ def calculate(board: chess.Board, color):
     myColor = color
     enemyColor = not color
 
-    allMyPieces = set()
-    allTheirPieces = set()
+    allMyPieces = SquareSet()
+    allTheirPieces = SquareSet()
 
     # Kings
     myKings = board.pieces(KING, myColor)
@@ -22,8 +22,8 @@ def calculate(board: chess.Board, color):
 
     kingWt = len(myKings) - len(theirKings)
 
-    allMyPieces.union(myKings)
-    allTheirPieces.union(theirKings)
+    allMyPieces = allMyPieces.union(myKings)
+    allTheirPieces = allTheirPieces.union(theirKings)
 
     # Queens
     myQueens = board.pieces(QUEEN, myColor)
@@ -31,8 +31,8 @@ def calculate(board: chess.Board, color):
 
     queenWt = len(myQueens) - len(theirQueens)
 
-    allMyPieces.union(myQueens)
-    allTheirPieces.union(theirQueens)
+    allMyPieces = allMyPieces.union(myQueens)
+    allTheirPieces = allTheirPieces.union(theirQueens)
 
     # Rooks
     myRooks = board.pieces(ROOK, myColor)
@@ -40,8 +40,8 @@ def calculate(board: chess.Board, color):
 
     rookWt = len(myRooks) - len(theirRooks)
 
-    allMyPieces.union(myRooks)
-    allTheirPieces.union(theirRooks)
+    allMyPieces = allMyPieces.union(myRooks)
+    allTheirPieces = allTheirPieces.union(theirRooks)
 
     # Bishops
     myBishops = board.pieces(BISHOP, myColor)
@@ -49,8 +49,8 @@ def calculate(board: chess.Board, color):
 
     bishWt = len(myBishops) - len(theirBishops)
 
-    allMyPieces.union(myBishops)
-    allTheirPieces.union(theirBishops)
+    allMyPieces = allMyPieces.union(myBishops)
+    allTheirPieces = allTheirPieces.union(theirBishops)
 
     # Knights
     myKnights = board.pieces(KNIGHT, myColor)
@@ -58,8 +58,8 @@ def calculate(board: chess.Board, color):
 
     kntWt = len(myKnights) - len(theirKnights)
 
-    allMyPieces.union(myKnights)
-    allTheirPieces.union(theirKnights)
+    allMyPieces = allMyPieces.union(myKnights)
+    allTheirPieces = allTheirPieces.union(theirKnights)
 
     # Pawns
     myPawns = board.pieces(PAWN,myColor)
@@ -69,10 +69,10 @@ def calculate(board: chess.Board, color):
     dblPawnWt = countDblPawns(myPawns) - countDblPawns(theirPawns)
     isoPawnWt = countIsoPawns(myPawns) - countIsoPawns(theirPawns)
 
-    allMyPieces.union(myPawns)
-    allTheirPieces.union(theirPawns)
+    allMyPieces = allMyPieces.union(myPawns)
+    allTheirPieces = allTheirPieces.union(theirPawns)
 
-    allMoves = board.legal_moves
+    allMoves = list(board.legal_moves)
     blkdPawnWt = countBlkdPawns(myPawns, allMoves) - countBlkdPawns(theirPawns, allMoves)
     mvmntWt = countMoves(allMyPieces, allMoves) - countMoves(allTheirPieces, allMoves)
 
