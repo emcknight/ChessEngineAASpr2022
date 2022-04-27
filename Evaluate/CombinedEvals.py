@@ -5,8 +5,8 @@
 # Version:      1.0
 
 import chess
-from Evaluate import evaluateScore, calculate, cl
+from Evaluate import evaluateScore, calculate, calculateRapid
 
 
 def eval(board: chess.Board, color):
-    return (0.5 * evaluateScore(board, color)) + (0.5 * calculate(board, color))
+    return (0.5 * evaluateScore(board, color)) + (0.5 * calculateRapid(board, color))

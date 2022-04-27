@@ -6,7 +6,7 @@
 
 import chess
 from Search import iterativedeepening
-from Evaluate import eval, calculate, evaluateScore, cl
+from Evaluate import eval, calculate, evaluateScore, calculateRapid
 from Utilities import Memo
 
 
