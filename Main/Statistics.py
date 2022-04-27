@@ -7,7 +7,7 @@
 import chess
 import time
 from collections import defaultdict
-from Evaluate import calculate, evaluateScore
+from Evaluate import calculate, evaluateScore, calculateRapid, eval
 from Search import minimax, minimaxAB, negamax, alphaBeta, tabular, iterativedeepening
 from Utilities import Memo
 import matplotlib.pyplot as plt
@@ -17,11 +17,7 @@ turn_counter = defaultdict(lambda: 0)  # Tracks the total number of times a turn
 player_runtimes = defaultdict(lambda: 0)  # Tracks the total runtime of all iterations of games for each turn for white
 enemy_runtimes = defaultdict(lambda: 0)  # Tracks the total runtime of all iterations of games for each turn for black
 avg_runtimes = dict()
-winloss = {
-    'material': 0,
-    'draw': 0,
-    'position': 0
-}
+winloss = defaultdict(lambda: 0)
 
 
 def minitest():
@@ -35,7 +31,7 @@ def minitest():
 
             # White move
             start = time.time()
-            _, move = minimax(board, 3, evaluateScore)
+            _, move = minimax(board, 3, eval)
             stop = time.time()
             board.push(move)
 
@@ -43,7 +39,7 @@ def minitest():
 
             # Black move
             start = time.time()
-            _, move = minimax(board, 3, evaluateScore)
+            _, move = minimax(board, 3, eval)
             stop = time.time()
             board.push(move)
 
@@ -81,7 +77,7 @@ def miniABtest():
 
             # White move
             start = time.time()
-            _, move = minimaxAB(board, 3, evaluateScore)
+            _, move = minimaxAB(board, 3, eval)
             stop = time.time()
             board.push(move)
 
@@ -89,7 +85,7 @@ def miniABtest():
 
             # Black move
             start = time.time()
-            _, move = minimaxAB(board, 3, evaluateScore)
+            _, move = minimaxAB(board, 3, eval)
             stop = time.time()
             board.push(move)
 
@@ -127,7 +123,7 @@ def negatest():
 
             # White move
             start = time.time()
-            _, move = negamax(3, board, board.turn, evaluateScore)
+            _, move = negamax(3, board, board.turn, eval)
             stop = time.time()
             board.push(move)
 
@@ -135,7 +131,7 @@ def negatest():
 
             # Black move
             start = time.time()
-            _, move = negamax(3, board, board.turn, evaluateScore)
+            _, move = negamax(3, board, board.turn, eval)
             stop = time.time()
             board.push(move)
 
@@ -173,7 +169,7 @@ def alphatest():
 
             # White move
             start = time.time()
-            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, evaluateScore)
+            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, eval)
             stop = time.time()
             board.push(move)
 
@@ -181,7 +177,7 @@ def alphatest():
 
             # Black move
             start = time.time()
-            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, evaluateScore)
+            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, eval)
             stop = time.time()
             board.push(move)
 
@@ -221,7 +217,7 @@ def tabulartest():
 
             # White move
             start = time.time()
-            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, evaluateScore, w_memo)
+            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, eval, w_memo)
             stop = time.time()
             board.push(move)
 
@@ -229,7 +225,7 @@ def tabulartest():
 
             # Black move
             start = time.time()
-            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, evaluateScore, b_memo)
+            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, eval, b_memo)
             stop = time.time()
             board.push(move)
 
@@ -269,7 +265,7 @@ def idtest():
 
             # White move
             start = time.time()
-            _, move = iterativedeepening(3, 5, board, evaluateScore, w_memo)
+            _, move = iterativedeepening(3, 5, board, eval, w_memo)
             stop = time.time()
             board.push(move)
 
@@ -277,7 +273,7 @@ def idtest():
 
             # Black move
             start = time.time()
-            _, move = iterativedeepening(3, 5, board, evaluateScore, b_memo)
+            _, move = iterativedeepening(3, 5, board, eval, b_memo)
             stop = time.time()
             board.push(move)
 
@@ -304,7 +300,7 @@ def idtest():
     enemy_runtimes.clear()
 
 
-def evaltest():
+def evaltest(eval1, eval2, eval1name, eval2name):
     print('Starting evaluation test...')
 
     for i in range(0, 10):
@@ -313,40 +309,40 @@ def evaltest():
         if i % 2 == 0:
             while board.outcome() is None:
                 # Move white - white is the material evaluation
-                move = iterativedeepening(10, 5, board, calculate, w_memo)
+                move = iterativedeepening(10, 5, board, eval1, w_memo)
                 board.push(move)
 
                 # Move black - black is the positional evaluation
-                move = iterativedeepening(10, 5, board, evaluateScore, b_memo)
+                move = iterativedeepening(10, 5, board, eval2, b_memo)
                 board.push(move)
 
             # Check the winner and increment score
             if board.outcome().winner is None:
-                winloss['draw'] += 1
+                winloss[f'{eval1name}-{eval2name}'] += 1
             elif board.outcome().winner == chess.WHITE:
-                winloss['material'] += 1
+                winloss[eval1name] += 1
             else:
-                winloss['position'] += 1
+                winloss[eval2name] += 1
 
             # Reset the board
             board.reset()
         else:
             while board.outcome() is None:
                 # Move white - white is the positional evaluation
-                move = iterativedeepening(10, 5, board, evaluateScore, w_memo)
+                _, move = iterativedeepening(10, 5, board, eval2, w_memo)
                 board.push(move)
 
                 # Move black - black is the material evaluation
-                move = iterativedeepening(10, 5, board, calculate, b_memo)
+                _, move = iterativedeepening(10, 5, board, eval1, b_memo)
                 board.push(move)
 
             # Check the winner and increment score
             if board.outcome().winner is None:
                 winloss['draw'] += 1
             elif board.outcome().winner == chess.WHITE:
-                winloss['position'] += 1
+                winloss[eval2name] += 1
             else:
-                winloss['material'] += 1
+                winloss[eval1name] += 1
 
             # Reset the board
             board.reset()
@@ -355,10 +351,105 @@ def evaltest():
     print('Finished evaluation test.')
 
 
+def evalruntimetest():
+    print('Starting evaluation runtime test...')
+    for i in range(0, 10):
+        counter = 0
+        w_memo = Memo()
+        b_memo = Memo()
+        while board.outcome() is None:
+            # Track the turn
+            counter += 1
+            turn_counter[counter] += 1
+
+            # White move
+            start = time.time()
+            _, move = iterativedeepening(3, 5, board, calculate, w_memo)
+            stop = time.time()
+            board.push(move)
+
+            player_runtimes[counter] += stop - start
+
+            # Black move
+            start = time.time()
+            _, move = iterativedeepening(3, 5, board, evaluateScore, b_memo)
+            stop = time.time()
+            board.push(move)
+
+            enemy_runtimes[counter] += stop - start
+
+        board.reset()
+        print(f'Finished game {i + 1} out of 10')
+
+    # Store average runtime per turn to avg_runtimes
+    values_white = list()
+    values_black = list()
+    for i in range(1, len(turn_counter) + 1):
+        avg_white = player_runtimes[i] / turn_counter[i]
+        avg_black = enemy_runtimes[i] / turn_counter[i]
+
+        values_white.append(avg_white)
+        values_black.append(avg_black)
+
+    avg_runtimes['material'] = values_white
+    avg_runtimes['position'] = values_black
+
+    turn_counter.clear()
+    player_runtimes.clear()
+    enemy_runtimes.clear()
+
+    for i in range(0, 10):
+        counter = 0
+        w_memo = Memo()
+        b_memo = Memo()
+        while board.outcome() is None:
+            # Track the turn
+            counter += 1
+            turn_counter[counter] += 1
+
+            # White move
+            start = time.time()
+            _, move = iterativedeepening(3, 5, board, calculateRapid, w_memo)
+            stop = time.time()
+            board.push(move)
+
+            player_runtimes[counter] += stop - start
+
+            # Black move
+            start = time.time()
+            _, move = iterativedeepening(3, 5, board, eval, b_memo)
+            stop = time.time()
+            board.push(move)
+
+            enemy_runtimes[counter] += stop - start
+
+        board.reset()
+        print(f'Finished game {i + 1} out of 10')
+
+    # Store average runtime per turn to avg_runtimes
+    values_white = list()
+    values_black = list()
+    for i in range(1, len(turn_counter) + 1):
+        avg_white = player_runtimes[i] / turn_counter[i]
+        avg_black = enemy_runtimes[i] / turn_counter[i]
+
+        values_white.append(avg_white)
+        values_black.append(avg_black)
+
+    avg_runtimes['rapid'] = values_white
+    avg_runtimes['combined'] = values_black
+
+    print('Finished iterative deepening test.')
+
+    turn_counter.clear()
+    player_runtimes.clear()
+    enemy_runtimes.clear()
+
+
 def displaystats():
     # Display runtime information
     print('Visualizing runtimes...')
-    figure, axs = plt.subplots(3)
+    figure, axs = plt.subplots(4)
     figure.suptitle('Avg runtime of search and evaluation function pairs for both players')
 
     # Plot runtimes for white
@@ -421,6 +512,28 @@ def displaystats():
     axs[1].legend()
     axs[1].set_title('Black Runtimes')
 
+    # Plot runtimes for evaluations
+    y = avg_runtimes['material']
+    x = len(y)
+    axs[2].plot(x, y, label='Material')
+
+    y = avg_runtimes['position']
+    x = len(y)
+    axs[2].plot(x, y, label='Positional')
+
+    y = avg_runtimes['rapid']
+    x = len(y)
+    axs[2].plot(x, y, label='Rapid')
+
+    y = avg_runtimes['combined']
+    x = len(y)
+    axs[2].plot(x, y, label='Linear Combination')
+
+    axs[2].set_xlabel('Turn #')
+    axs[2].set_ylabel('Avg Runtime (seconds)')
+    axs[2].legend()
+    axs[2].set_title('Evaluation Runtimes')
+
     labels = list()
     values = list()
 
@@ -428,9 +541,9 @@ def displaystats():
         labels.append(key)
         values.append(value)
 
-    axs[2].pie(values, labels=labels)
-    axs[2].axis('equal')
-    axs[2].set_title('Win-Loss ration of evaluation functions')
+    axs[3].pie(values, labels=labels)
+    axs[3].axis('equal')
+    axs[3].set_title('Win-Loss ration of evaluation functions')
 
     # Display and save figure
     figure.tight_layout()
@@ -446,7 +559,13 @@ if __name__ == '__main__':
     alphatest()
     tabulartest()
     idtest()
-    evaltest()
+    evalruntimetest()
+    evaltest(calculate, evaluateScore, 'material', 'position')
+    evaltest(calculate, calculateRapid, 'material', 'rapid')
+    evaltest(calculate, eval, 'material', 'combined')
+    evaltest(evaluateScore, calculateRapid, 'position', 'rapid')
+    evaltest(evaluateScore, eval, 'position', 'combined')
+    evaltest(calculateRapid, eval, 'rapid', 'combined')
     print('Finished testing.')
     print('Visualizing data...')
     displaystats()
