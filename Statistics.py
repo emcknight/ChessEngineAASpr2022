@@ -342,7 +342,7 @@ def displaystats():
 
     axs[0].set_xlabel('Depth')
     axs[0].set_ylabel('Avg Runtime (seconds)')
-    axs[0].legend()
+    axs[0].legend(bbox_to_anchor=(1.05, 1))
     axs[0].set_title('Search Algorithm Runtimes')
 
     # Plot runtimes for evaluation algorithms
@@ -364,7 +364,7 @@ def displaystats():
 
     axs[1].set_xlabel('Depth')
     axs[1].set_ylabel('Avg Runtime (seconds)')
-    axs[1].legend()
+    axs[1].legend(bbox_to_anchor=(1.05, 1))
     axs[1].set_title('Evaluation Runtimes')
 
 
@@ -376,16 +376,16 @@ def displaystats():
 
 if __name__ == '__main__':
     print('Starting tests...')
-    minitest(4)
-    miniABtest(4)
-    negatest(4)
-    alphatest(4)
-    tabulartest(4)
-    idtest(4)
-    evaltest(calculate, 4, 'material')
-    evaltest(calculateRapid, 4, 'rapid')
-    evaltest(evaluateScore, 4, 'position')
-    evaltest(eval, 4, 'combined')
+    minitest(3)
+    miniABtest(3)
+    negatest(3)
+    alphatest(3)
+    tabulartest(3)
+    idtest(3)
+    evaltest(calculate, 3, 'material')
+    evaltest(calculateRapid, 3, 'rapid')
+    evaltest(evaluateScore, 3, 'position')
+    evaltest(eval, 3, 'combined')
     print('Finished testing.')
     print('Visualizing data...')
     displaystats()
