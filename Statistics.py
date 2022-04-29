@@ -10,502 +10,382 @@ from collections import defaultdict
 from Evaluate import calculate, evaluateScore, calculateRapid, eval
 from Search import minimax, minimaxAB, negamax, alphaBeta, tabular, iterativedeepening
 from Utilities import Memo
+import matplotlib.pyplot as plt
 
 board = chess.Board()
-turn_counter = defaultdict(lambda: 0)  # Tracks the total number of times a turn has been reached for testing
-player_runtimes = defaultdict(lambda: 0)  # Tracks the total runtime of all iterations of games for each turn for white
-enemy_runtimes = defaultdict(lambda: 0)  # Tracks the total runtime of all iterations of games for each turn for black
 avg_runtimes = dict()
 winloss = defaultdict(lambda: 0)
 
 
-def minitest():
+def minitest(maxdepth):
     print('Starting minimax test...')
-    for i in range(0, 10):
-        counter = 0
+    runtimes = list()
+    for i in range(1, maxdepth+1):
+        total_runtime = 0
+        turns = 0
         while board.outcome() is None:
-            # Track the turn
-            counter += 1
-            turn_counter[counter] += 1
-
+            # Track the halfmove clock
+            turns += 1
+            
             # White move
             start = time.time()
-            _, move = minimax(board, 3, calculateRapid)
+            _, move = minimax(board, i, calculateRapid)
             stop = time.time()
             board.push(move)
-
-            player_runtimes[counter] += stop - start
+            
+            total_runtime += stop - start
             
             if board.outcome() is not None:
                 break
-
+            
+            turns += 1
+            
             # Black move
             start = time.time()
-            _, move = minimax(board, 3, calculateRapid)
+            _, move = minimax(board, i, calculateRapid)
             stop = time.time()
             board.push(move)
-
-            enemy_runtimes[counter] += stop - start
-
+            
+            total_runtime += stop - start
+        
         board.reset()
-        print(f'Finished game {i+1} out of 10')
-
-    # Store average runtime per turn to avg_runtimes
-    values_white = list()
-    values_black = list()
-    for i in range(1, len(turn_counter) + 1):
-        avg_white = player_runtimes[i] / turn_counter[i]
-        avg_black = enemy_runtimes[i] / turn_counter[i]
-
-        values_white.append(avg_white)
-        values_black.append(avg_black)
-
-    avg_runtimes['minitest'] = [values_white, values_black]
+        print(f'Finished game {i} out of {maxdepth}')
+        
+        # Store average runtime for depth
+        runtimes.append(total_runtime/turns)
+    
+    avg_runtimes['minitest'] = runtimes
     print('Finished minimax test.')
+    
 
-    turn_counter.clear()
-    player_runtimes.clear()
-    enemy_runtimes.clear()
-
-
-def miniABtest():
-    print('Starting minimax alpha beta test...')
-    for i in range(0, 10):
-        counter = 0
+def miniABtest(maxdepth):
+    print('Starting minimax alpha-beta test...')
+    runtimes = list()
+    for i in range(1, maxdepth+1):
+        total_runtime = 0
+        turns = 0
         while board.outcome() is None:
-            # Track the turn
-            counter += 1
-            turn_counter[counter] += 1
-
+            # Track the halfmove clock
+            turns += 1
+            
             # White move
             start = time.time()
-            _, move = minimaxAB(board, 3, calculateRapid)
+            _, move = minimaxAB(board, i, calculateRapid)
             stop = time.time()
             board.push(move)
-
-            player_runtimes[counter] += stop - start
+            
+            total_runtime += stop - start
             
             if board.outcome() is not None:
                 break
-
+            
+            turns += 1
+            
             # Black move
             start = time.time()
-            _, move = minimaxAB(board, 3, calculateRapid)
+            _, move = minimaxAB(board, i, calculateRapid)
             stop = time.time()
             board.push(move)
-
-            enemy_runtimes[counter] += stop - start
-
+            
+            total_runtime += stop - start
+        
         board.reset()
-        print(f'Finished game {i+1} out of 10')
-
-    # Store average runtime per turn to avg_runtimes
-    values_white = list()
-    values_black = list()
-    for i in range(1, len(turn_counter) + 1):
-        avg_white = player_runtimes[i] / turn_counter[i]
-        avg_black = enemy_runtimes[i] / turn_counter[i]
-
-        values_white.append(avg_white)
-        values_black.append(avg_black)
-
-    avg_runtimes['miniABtest'] = [values_white, values_black]
-    print('Finished minimax alpha beta test.')
-
-    turn_counter.clear()
-    player_runtimes.clear()
-    enemy_runtimes.clear()
+        print(f'Finished game {i} out of {maxdepth}')
+        
+        # Store average runtime for depth
+        runtimes.append(total_runtime/turns)
+    
+    avg_runtimes['miniABtest'] = runtimes
+    print('Finished minimax alpha-beta test.')
 
 
-def negatest():
+def negatest(maxdepth):
     print('Starting negamax test...')
-    for i in range(0, 10):
-        counter = 0
+    runtimes = list()
+    for i in range(1, maxdepth+1):
+        total_runtime = 0
+        turns = 0
         while board.outcome() is None:
-            # Track the turn
-            counter += 1
-            turn_counter[counter] += 1
-
+            # Track the halfmove clock
+            turns += 1
+            
             # White move
             start = time.time()
-            _, move = negamax(3, board, board.turn, calculateRapid)
+            _, move = negamax(i, board, board.turn, calculateRapid)
             stop = time.time()
             board.push(move)
-
-            player_runtimes[counter] += stop - start
+            
+            total_runtime += stop - start
             
             if board.outcome() is not None:
                 break
-
+            
+            turns += 1
+            
             # Black move
             start = time.time()
-            _, move = negamax(3, board, board.turn, calculateRapid)
+            _, move = negamax(i, board, board.turn, calculateRapid)
             stop = time.time()
             board.push(move)
-
-            enemy_runtimes[counter] += stop - start
-
+            
+            total_runtime += stop - start
+        
         board.reset()
-        print(f'Finished game {i+1} out of 10')
-
-    # Store average runtime per turn to avg_runtimes
-    values_white = list()
-    values_black = list()
-    for i in range(1, len(turn_counter) + 1):
-        avg_white = player_runtimes[i] / turn_counter[i]
-        avg_black = enemy_runtimes[i] / turn_counter[i]
-
-        values_white.append(avg_white)
-        values_black.append(avg_black)
-
-    avg_runtimes['negatest'] = [values_white, values_black]
+        print(f'Finished game {i} out of {maxdepth}')
+        
+        # Store average runtime for depth
+        runtimes.append(total_runtime/turns)
+    
+    avg_runtimes['negatest'] = runtimes
     print('Finished negamax test.')
 
-    turn_counter.clear()
-    player_runtimes.clear()
-    enemy_runtimes.clear()
 
-
-def alphatest():
-    print('Starting alpha beta test...')
-    for i in range(0, 10):
-        counter = 0
+def alphatest(maxdepth):
+    print('Starting negamax alpha-beta test...')
+    runtimes = list()
+    for i in range(1, maxdepth+1):
+        total_runtime = 0
+        turns = 0
         while board.outcome() is None:
-            # Track the turn
-            counter += 1
-            turn_counter[counter] += 1
-
+            # Track the halfmove clock
+            turns += 1
+            
             # White move
             start = time.time()
-            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, calculateRapid)
+            _, move = alphaBeta(i, float('-inf'), float('inf'), board, board.turn, calculateRapid)
             stop = time.time()
             board.push(move)
-
-            player_runtimes[counter] += stop - start
+            
+            total_runtime += stop - start
             
             if board.outcome() is not None:
                 break
-
+            
+            turns += 1
+            
             # Black move
             start = time.time()
-            _, move = alphaBeta(3, float('-inf'), float('inf'), board, board.turn, calculateRapid)
+            _, move = alphaBeta(i, float('-inf'), float('inf'), board, board.turn, calculateRapid)
             stop = time.time()
             board.push(move)
-
-            enemy_runtimes[counter] += stop - start
-
+            
+            total_runtime += stop - start
+        
         board.reset()
-        print(f'Finished game {i+1} out of 10')
-
-    # Store average runtime per turn to avg_runtimes
-    values_white = list()
-    values_black = list()
-    for i in range(1, len(turn_counter) + 1):
-        avg_white = player_runtimes[i] / turn_counter[i]
-        avg_black = enemy_runtimes[i] / turn_counter[i]
-
-        values_white.append(avg_white)
-        values_black.append(avg_black)
-
-    avg_runtimes['alphatest'] = [values_white, values_black]
-    print('Finished alpha beta test.')
-
-    turn_counter.clear()
-    player_runtimes.clear()
-    enemy_runtimes.clear()
+        print(f'Finished game {i} out of {maxdepth}')
+        
+        # Store average runtime for depth
+        runtimes.append(total_runtime/turns)
+    
+    avg_runtimes['alphatest'] = runtimes
+    print('Finished negamax alpha-beta test.')
 
 
-def tabulartest():
-    print('Starting tabularization test...')
-    for i in range(0, 10):
-        counter = 0
+def tabulartest(maxdepth):
+    print('Starting negamax alpha-beta tabularization test...')
+    runtimes = list()
+    for i in range(1, maxdepth+1):
+        total_runtime = 0
+        turns = 0
         w_memo = Memo()
         b_memo = Memo()
         while board.outcome() is None:
-            # Track the turn
-            counter += 1
-            turn_counter[counter] += 1
-
+            # Track the halfmove clock
+            turns += 1
+            
             # White move
             start = time.time()
-            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, calculateRapid, w_memo)
+            _, move = tabular(i, float('-inf'), float('inf'), board, board.turn, calculateRapid, w_memo)
             stop = time.time()
             board.push(move)
-
-            player_runtimes[counter] += stop - start
+            
+            total_runtime += stop - start
             
             if board.outcome() is not None:
                 break
-
+            
+            turns += 1
+            
             # Black move
             start = time.time()
-            _, move = tabular(3, float('-inf'), float('inf'), board, board.turn, calculateRapid, b_memo)
+            _, move = tabular(i, float('-inf'), float('inf'), board, board.turn, calculateRapid, b_memo)
             stop = time.time()
             board.push(move)
-
-            enemy_runtimes[counter] += stop - start
-
+            
+            total_runtime += stop - start
+        
         board.reset()
-        print(f'Finished game {i + 1} out of 10')
-
-    # Store average runtime per turn to avg_runtimes
-    values_white = list()
-    values_black = list()
-    for i in range(1, len(turn_counter) + 1):
-        avg_white = player_runtimes[i] / turn_counter[i]
-        avg_black = enemy_runtimes[i] / turn_counter[i]
-
-        values_white.append(avg_white)
-        values_black.append(avg_black)
-
-    avg_runtimes['tabtest'] = [values_white, values_black]
-    print('Finished tabularization test.')
-
-    turn_counter.clear()
-    player_runtimes.clear()
-    enemy_runtimes.clear()
+        print(f'Finished game {i} out of {maxdepth}')
+        
+        # Store average runtime for depth
+        runtimes.append(total_runtime/turns)
+    
+    avg_runtimes['tabtest'] = runtimes
+    print('Finished negamax alpha-beta tabularization test.')
 
 
-def idtest():
+def idtest(maxdepth):
     print('Starting iterative deepening test...')
-    for i in range(0, 10):
-        counter = 0
+    runtimes = list()
+    for i in range(1, maxdepth+1):
+        total_runtime = 0
+        turns = 0
         w_memo = Memo()
         b_memo = Memo()
         while board.outcome() is None:
-            # Track the turn
-            counter += 1
-            turn_counter[counter] += 1
-
+            # Track the halfmove clock
+            turns += 1
+            
             # White move
             start = time.time()
-            _, move = iterativedeepening(3, 5, board, calculateRapid, w_memo)
+            _, move = iterativedeepening(i, 2, board, calculateRapid, w_memo)
             stop = time.time()
             board.push(move)
-
-            player_runtimes[counter] += stop - start
+            
+            total_runtime += stop - start
             
             if board.outcome() is not None:
                 break
-
+            
+            turns += 1
+            
             # Black move
             start = time.time()
-            _, move = iterativedeepening(3, 5, board, calculateRapid, b_memo)
+            _, move = iterativedeepening(i, 2, board, calculateRapid, b_memo)
             stop = time.time()
             board.push(move)
-
-            enemy_runtimes[counter] += stop - start
-
+            
+            total_runtime += stop - start
+        
         board.reset()
-        print(f'Finished game {i + 1} out of 10')
-
-    # Store average runtime per turn to avg_runtimes
-    values_white = list()
-    values_black = list()
-    for i in range(1, len(turn_counter) + 1):
-        avg_white = player_runtimes[i] / turn_counter[i]
-        avg_black = enemy_runtimes[i] / turn_counter[i]
-
-        values_white.append(avg_white)
-        values_black.append(avg_black)
-
-    avg_runtimes['idtest'] = [values_white, values_black]
+        print(f'Finished game {i} out of {maxdepth}')
+        
+        # Store average runtime for depth
+        runtimes.append(total_runtime/turns)
+    
+    avg_runtimes['idtest'] = runtimes
     print('Finished iterative deepening test.')
-
-    turn_counter.clear()
-    player_runtimes.clear()
-    enemy_runtimes.clear()
-
-
-def evaltest(eval1, eval2, eval1name, eval2name):
-    print('Starting evaluation test...')
-
-    for i in range(0, 10):
-        w_memo = Memo()
-        b_memo = Memo()
-        if i % 2 == 0:
-            while board.outcome() is None:
-                # Move white - white is the material evaluation
-                _, move = iterativedeepening(10, 5, board, eval1, w_memo)
-                board.push(move)
-                
-                if board.outcome() is not None:
-                    break
-
-                # Move black - black is the positional evaluation
-                _, move = iterativedeepening(10, 5, board, eval2, b_memo)
-                board.push(move)
-
-            # Check the winner and increment score
-            if board.outcome().winner is None:
-                winloss[f'{eval1name}-{eval2name}'] += 1
-            elif board.outcome().winner == chess.WHITE:
-                winloss[eval1name] += 1
-            else:
-                winloss[eval2name] += 1
-
-            # Reset the board
-            board.reset()
-        else:
-            while board.outcome() is None:
-                # Move white - white is the positional evaluation
-                _, move = iterativedeepening(10, 5, board, eval2, w_memo)
-                board.push(move)
-                
-                if board.outcome() is not None:
-                    break
-
-                # Move black - black is the material evaluation
-                _, move = iterativedeepening(10, 5, board, eval1, b_memo)
-                board.push(move)
-
-            # Check the winner and increment score
-            if board.outcome().winner is None:
-                winloss['draw'] += 1
-            elif board.outcome().winner == chess.WHITE:
-                winloss[eval2name] += 1
-            else:
-                winloss[eval1name] += 1
-
-            # Reset the board
-            board.reset()
-
-        print(f'Finished game {i+1} out of 10.')
-    print('Finished evaluation test.')
-
-
-def evalruntimetest():
+    
+    
+def evaltest(evaluation, maxdepth, evalname):
     print('Starting evaluation runtime test...')
-    for i in range(0, 10):
-        counter = 0
+    runtimes = list()
+    for i in range(1, maxdepth+1):
+        total_runtime = 0
+        turns = 0
         w_memo = Memo()
         b_memo = Memo()
         while board.outcome() is None:
-            # Track the turn
-            counter += 1
-            turn_counter[counter] += 1
-
+            # Track the halfmove clock
+            turns += 1
+            
             # White move
             start = time.time()
-            _, move = iterativedeepening(3, 5, board, calculate, w_memo)
+            _, move = iterativedeepening(i, 2, board, evaluation, w_memo)
             stop = time.time()
             board.push(move)
-
-            player_runtimes[counter] += stop - start
+            
+            total_runtime += stop - start
             
             if board.outcome() is not None:
                 break
-
-            # Black move
-            start = time.time()
-            _, move = iterativedeepening(3, 5, board, evaluateScore, b_memo)
-            stop = time.time()
-            board.push(move)
-
-            enemy_runtimes[counter] += stop - start
-
-        board.reset()
-        print(f'Finished game {i + 1} out of 10')
-
-    # Store average runtime per turn to avg_runtimes
-    values_white = list()
-    values_black = list()
-    for i in range(1, len(turn_counter) + 1):
-        avg_white = player_runtimes[i] / turn_counter[i]
-        avg_black = enemy_runtimes[i] / turn_counter[i]
-
-        values_white.append(avg_white)
-        values_black.append(avg_black)
-
-    avg_runtimes['material'] = values_white
-    avg_runtimes['position'] = values_black
-
-    turn_counter.clear()
-    player_runtimes.clear()
-    enemy_runtimes.clear()
-
-    for i in range(0, 10):
-        counter = 0
-        w_memo = Memo()
-        b_memo = Memo()
-        while board.outcome() is None:
-            # Track the turn
-            counter += 1
-            turn_counter[counter] += 1
-
-            # White move
-            start = time.time()
-            _, move = iterativedeepening(3, 5, board, calculateRapid, w_memo)
-            stop = time.time()
-            board.push(move)
-
-            player_runtimes[counter] += stop - start
             
-            if board.outcome() is not None:
-                break
-
+            turns += 1
+            
             # Black move
             start = time.time()
-            _, move = iterativedeepening(3, 5, board, eval, b_memo)
+            _, move = iterativedeepening(i, 2, board, evaluation, b_memo)
             stop = time.time()
             board.push(move)
-
-            enemy_runtimes[counter] += stop - start
-
+            
+            total_runtime += stop - start
+        
         board.reset()
-        print(f'Finished game {i + 1} out of 10')
-
-    # Store average runtime per turn to avg_runtimes
-    values_white = list()
-    values_black = list()
-    for i in range(1, len(turn_counter) + 1):
-        avg_white = player_runtimes[i] / turn_counter[i]
-        avg_black = enemy_runtimes[i] / turn_counter[i]
-
-        values_white.append(avg_white)
-        values_black.append(avg_black)
-
-    avg_runtimes['rapid'] = values_white
-    avg_runtimes['combined'] = values_black
-
-    print('Finished iterative deepening test.')
-
-    turn_counter.clear()
-    player_runtimes.clear()
-    enemy_runtimes.clear()
+        print(f'Finished game {i} out of {maxdepth}')
+        
+        # Store average runtime for depth
+        runtimes.append(total_runtime/turns)
     
+    avg_runtimes[evalname] = runtimes
+    print('Finished evaluation runtime test.')
     
-def saveData(filename):
-    with open(filename, 'w') as f:
-        f.write(f'Minimax {avg_runtimes["minitest"][0]} {avg_runtimes["minitest"][1]}')
-        f.write(f'Minimax-AB {avg_runtimes["miniABtest"][0]} {avg_runtimes["miniABtest"][1]}')
-        f.write(f'Negamax {avg_runtimes["negatest"][0]} {avg_runtimes["negatest"][1]}')
-        f.write(f'Negamax-AB {avg_runtimes["alphatest"][0]} {avg_runtimes["alphatest"][1]}')
-        f.write(f'Tabularization {avg_runtimes["tabtest"][0]} {avg_runtimes["tabtest"][1]}')
-        f.write(f'Iterative-Deepening {avg_runtimes["idtest"][0]} {avg_runtimes["idtest"][1]}')
-        f.write(f'Material {avg_runtimes["material"]}')
-        f.write(f'Position {avg_runtimes["position"]}')
-        f.write(f'Rapid {avg_runtimes["rapid"]}')
-        f.write(f'Combined {avg_runtimes["combined"]}')
-        for key, value in winloss.items():
-            f.write(f'{key} {value}')
+
+def displaystats():
+    print('Visualizing runtimes...')
+    figure, axs = plt.subplots(2)
+    figure.suptitle('Avg runtime of search and evaluation function at specified depths')
+    
+    # Plot runtimes for search algorithms
+    y = avg_runtimes['minitest']
+    x = list(range(1, len(y)+1))
+    axs[0].plot(x, y, label='Minimax')
+    
+    y = avg_runtimes['miniABtest']
+    x = list(range(1, len(y)+1))
+    axs[0].plot(x, y, label='Minimax w/ Alpha Beta')
+
+    y = avg_runtimes['negatest']
+    x = list(range(1, len(y)+1))
+    axs[0].plot(x, y, label='Negamax')
+
+    y = avg_runtimes['alphatest']
+    x = list(range(1, len(y)+1))
+    axs[0].plot(x, y, label='Negamax w/ Alpha Beta')
+
+    y = avg_runtimes['tabtest']
+    x = list(range(1, len(y)+1))
+    axs[0].plot(x,y, label='Negamax w/ Alpha Beta and Memoization')
+
+    y = avg_runtimes['idtest']
+    x = list(range(1, len(y)+1))
+    axs[0].plot(x, y, label='Negamax w/ Alpha Beta, Memoization, and Iterative Deepening')
+
+    axs[0].set_xlabel('Depth')
+    axs[0].set_ylabel('Avg Runtime (seconds)')
+    axs[0].legend()
+    axs[0].set_title('Search Algorithm Runtimes')
+
+    # Plot runtimes for evaluation algorithms
+    y = avg_runtimes['material']
+    x = list(range(1, len(y)+1))
+    axs[1].plot(x, y, label='Material')
+
+    y = avg_runtimes['rapid']
+    x = list(range(1, len(y)+1))
+    axs[1].plot(x, y, label='Rapid')
+    
+    y = avg_runtimes['position']
+    x = list(range(1, len(y)+1))
+    axs[1].plot(x, y, label='Positional')
+    
+    y = avg_runtimes['combined']
+    x = list(range(1, len(y)+1))
+    axs[1].plot(x, y, label='Linear Combination')
+
+    axs[1].set_xlabel('Depth')
+    axs[1].set_ylabel('Avg Runtime (seconds)')
+    axs[1].legend()
+    axs[1].set_title('Evaluation Runtimes')
+
+
+    # Display and save figure
+    figure.tight_layout()
+    figure.savefig('Runtimes.png')
+    figure.show()
 
 
 if __name__ == '__main__':
     print('Starting tests...')
-    minitest()
-    miniABtest()
-    negatest()
-    alphatest()
-    tabulartest()
-    idtest()
-    evalruntimetest()
-    evaltest(calculate, evaluateScore, 'material', 'position')
-    evaltest(calculate, calculateRapid, 'material', 'rapid')
-    evaltest(calculate, eval, 'material', 'combined')
-    evaltest(evaluateScore, calculateRapid, 'position', 'rapid')
-    evaltest(evaluateScore, eval, 'position', 'combined')
-    evaltest(calculateRapid, eval, 'rapid', 'combined')
+    minitest(4)
+    miniABtest(4)
+    negatest(4)
+    alphatest(4)
+    tabulartest(4)
+    idtest(4)
+    evaltest(calculate, 4, 'material')
+    evaltest(calculateRapid, 4, 'rapid')
+    evaltest(evaluateScore, 4, 'position')
+    evaltest(eval, 4, 'combined')
     print('Finished testing.')
-    print('Saving data...')
-    saveData('Statistics_results.txt')
+    print('Visualizing data...')
+    displaystats()

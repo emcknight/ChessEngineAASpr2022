@@ -49,7 +49,7 @@ class Memo:
 def searchMax(depth, board: chess.Board, evaluation):
     if depth == 0 or board.outcome() is not None:
         # return the score for the board and a filler board move for syntax
-        return [evaluation(board, chess.WHITE), "0000"]
+        return [evaluation(board, chess.WHITE), None]
     maxVal = float('-inf')
     maxMove = None
     for move in board.legal_moves:
@@ -65,7 +65,7 @@ def searchMax(depth, board: chess.Board, evaluation):
 def searchMin(depth, board: chess.Board, evaluation):
     if depth == 0 or board.outcome() is not None:
         # return the score for the board and a filler board move for syntax
-        return [evaluation(board, chess.BLACK), "0000"]
+        return [evaluation(board, chess.BLACK), None]
     minVal = float('inf')
     minMove = None
     for move in board.legal_moves:
@@ -81,7 +81,7 @@ def searchMin(depth, board: chess.Board, evaluation):
 def maxAB(depth, board: chess.Board, alpha, beta, evaluation):
     if depth == 0 or board.outcome() is not None:
         # return the score for the board and a filler board move for syntax
-        return [evaluation(board, chess.WHITE), "000"]
+        return [evaluation(board, chess.WHITE), None]
     maxVal = float('-inf')
     maxMove = None
     for move in board.legal_moves:
@@ -101,7 +101,7 @@ def maxAB(depth, board: chess.Board, alpha, beta, evaluation):
 def minAB(depth, board: chess.Board, alpha, beta, evaluation):
     if depth == 0 or board.outcome() is not None:
         # return the score for the board and a filler board move for syntax
-        return [evaluation(board, chess.BLACK), "0000"]
+        return [evaluation(board, chess.BLACK), None]
     minVal = float('inf')
     minMove = None
     for move in board.legal_moves:
